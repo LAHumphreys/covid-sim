@@ -14,8 +14,9 @@ class DensityFiles: public ParamReadTest {};
 class NetworkFiles: public ParamReadTest {};
 class OutFileBasePath: public ParamReadTest {};
 class ParamsFile: public ParamReadTest {};
-class PreParamsFile: public ParamReadTest {};
 class PlaceClose: public ParamReadTest {};
+class PreParamsFile: public ParamReadTest {};
+class R0Scale: public ParamReadTest {};
 
 TEST_F(AdminFile, Specified) {
     args.adminFile = "adminFile.txt";
@@ -180,14 +181,24 @@ TEST_F(Airports, SpecifyAirportFile ) {
     ASSERT_EQ(GotAP, 1);
     ASSERT_STREQ(AirTravelFile, "airTravel.dat");
 }
+TEST_F(R0Scale, Optional) {
+    args.r0.reset();
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(P().R0scale, 1.0);
+}
+TEST_F(R0Scale, Specified) {
+    args.r0 = "2.3";
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_FLOAT_EQ(P().R0scale, 2.3);
+}
 
 TEST_F(ParamReadTest, DefaultArgs) {
-    CovidSimCmdLineArgs args;
     InvokeReadParam(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
 }
 TEST_F(ParamReadTest, SetupSeeds) {
-    CovidSimCmdLineArgs args;
     args.setupSeeds[0] = "789";
     args.setupSeeds[1] = "456";
 
@@ -198,7 +209,6 @@ TEST_F(ParamReadTest, SetupSeeds) {
     ASSERT_EQ(P().setupSeed2, 456);
 }
 TEST_F(ParamReadTest, RunTimeSeeds) {
-    CovidSimCmdLineArgs args;
     args.runSeeds[0] = "123";
     args.runSeeds[1] = "456";
 

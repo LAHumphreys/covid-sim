@@ -7,8 +7,7 @@
 
 std::vector<std::string> CovidSimCmdLineArgs::BuildCmdLine() const {
     std::vector<std::string> args ={
-            "CovidSim",
-            "/R:1.1"
+            "CovidSim"
     };
     const auto addOptionalArg = [&](const std::string& argSwitch, const std::optional<std::string>& argField) -> void {
         if (argField.has_value()) {
@@ -24,6 +23,7 @@ std::vector<std::string> CovidSimCmdLineArgs::BuildCmdLine() const {
     addOptionalArg("O", outFileBasePath);
     addOptionalArg("P", paramFile);
     addOptionalArg("PP", preParamFile);
+    addOptionalArg("R", r0);
     addOptionalArg("S", networkFileToSave);
 
     std::stringstream paramName;
