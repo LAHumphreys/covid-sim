@@ -522,7 +522,7 @@ void InfectSweep(double t, int run) //added run number as argument in order to r
 														StateT[tn].inf_queue[cq][StateT[tn].n_queue[cq]++] = {-1, i3, -1};
 													else
 													{
-														short int infect_type = 2 + k + NUM_PLACE_TYPES + INFECT_TYPE_MASK * (1 + si->infect_type / INFECT_TYPE_MASK);
+														short int infect_type = 2 + k + PlaceType::Count + INFECT_TYPE_MASK * (1 + si->infect_type / INFECT_TYPE_MASK);
 														StateT[tn].inf_queue[cq][StateT[tn].n_queue[cq]++] = {ci, i3, infect_type};
 													}
 												}
@@ -681,7 +681,7 @@ void InfectSweep(double t, int run) //added run number as argument in order to r
 												StateT[tn].inf_queue[cq][StateT[tn].n_queue[cq]++] = { -1, i3, -1 };
 											else
 											{
-												short int infect_type = 2 + 2 * NUM_PLACE_TYPES + INFECT_TYPE_MASK * (1 + si->infect_type / INFECT_TYPE_MASK);
+												short int infect_type = 2 + 2 * PlaceType::Count + INFECT_TYPE_MASK * (1 + si->infect_type / INFECT_TYPE_MASK);
 												StateT[tn].inf_queue[cq][StateT[tn].n_queue[cq]++] = { ci, i3, infect_type };
 											}
 										}

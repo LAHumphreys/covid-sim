@@ -8,7 +8,6 @@
 
 const int ADUNIT_LOOKUP_SIZE = 1000000;
 const int MAX_COUNTRIES = 100;
-const int NUM_PLACE_TYPES = 4;
 const int MAX_ADUNITS = 3200;
 
 // Maximal absent time - used for array sizing

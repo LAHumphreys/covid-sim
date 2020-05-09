@@ -91,8 +91,8 @@ double indivR0[MAX_SEC_REC][MAX_GEN_REC], indivR0_av[MAX_SEC_REC][MAX_GEN_REC];
 double inf_household[MAX_HOUSEHOLD_SIZE + 1][MAX_HOUSEHOLD_SIZE + 1], denom_household[MAX_HOUSEHOLD_SIZE + 1];
 double inf_household_av[MAX_HOUSEHOLD_SIZE + 1][MAX_HOUSEHOLD_SIZE + 1], AgeDist[NUM_AGE_GROUPS], AgeDist2[NUM_AGE_GROUPS];
 double case_household[MAX_HOUSEHOLD_SIZE + 1][MAX_HOUSEHOLD_SIZE + 1], case_household_av[MAX_HOUSEHOLD_SIZE + 1][MAX_HOUSEHOLD_SIZE + 1];
-double PropPlaces[NUM_AGE_GROUPS * AGE_GROUP_WIDTH][NUM_PLACE_TYPES];
-double PropPlacesC[NUM_AGE_GROUPS * AGE_GROUP_WIDTH][NUM_PLACE_TYPES], AirTravelDist[MAX_DIST];
+double PropPlaces[NUM_AGE_GROUPS * AGE_GROUP_WIDTH][PlaceType::Count];
+double PropPlacesC[NUM_AGE_GROUPS * AGE_GROUP_WIDTH][PlaceType::Count], AirTravelDist[MAX_DIST];
 double PeakHeightSum, PeakHeightSS, PeakTimeSum, PeakTimeSS;
 
 // These allow up to about 2 billion people per pixel, which should be ample.
@@ -104,7 +104,7 @@ int32_t *bmTreated; // The number of treated people in each bitmap pixel.
 char OutFile[1024], OutFileBase[1024], OutDensFile[1024], SnapshotLoadFile[1024], SnapshotSaveFile[1024], AdunitFile[1024];
 
 int ns, DoInitUpdateProbs, InterruptRun = 0;
-int PlaceDistDistrib[NUM_PLACE_TYPES][MAX_DIST], PlaceSizeDistrib[NUM_PLACE_TYPES][MAX_PLACE_SIZE];
+int PlaceDistDistrib[PlaceType::Count][MAX_DIST], PlaceSizeDistrib[PlaceType::Count][MAX_PLACE_SIZE];
 
 
 /* int NumPC,NumPCD; */
@@ -720,13 +720,13 @@ void ReadParams(char* ParamFile, char* PreParamFile)
 		P.PlaceTypeNum = P.DoAirports = 0;
 	if (P.DoPlaces)
 	{
-		if (P.PlaceTypeNum > NUM_PLACE_TYPES) ERR_CRITICAL("Too many place types\n");
+		if (P.PlaceTypeNum > PlaceType::Count) ERR_CRITICAL("Too many place types\n");
 		GetInputParameter(PreParamFile_dat, AdminFile_dat, "Minimum age for age group 1 in place types", "%i", (void*)P.PlaceTypeAgeMin, P.PlaceTypeNum, 1, 0);
 		GetInputParameter(PreParamFile_dat, AdminFile_dat, "Maximum age for age group 1 in place types", "%i", (void*)P.PlaceTypeAgeMax, P.PlaceTypeNum, 1, 0);
 		GetInputParameter(PreParamFile_dat, AdminFile_dat, "Proportion of age group 1 in place types", "%lf", (void*) & (P.PlaceTypePropAgeGroup), P.PlaceTypeNum, 1, 0);
 		if (!GetInputParameter2(PreParamFile_dat, AdminFile_dat, "Proportion of age group 2 in place types", "%lf", (void*) & (P.PlaceTypePropAgeGroup2), P.PlaceTypeNum, 1, 0))
 		{
-			for (i = 0; i < NUM_PLACE_TYPES; i++)
+			for (i = 0; i < PlaceType::Count; i++)
 			{
 				P.PlaceTypePropAgeGroup2[i] = 0;
 				P.PlaceTypeAgeMin2[i] = 0;
@@ -740,7 +740,7 @@ void ReadParams(char* ParamFile, char* PreParamFile)
 		}
 		if (!GetInputParameter2(PreParamFile_dat, AdminFile_dat, "Proportion of age group 3 in place types", "%lf", (void*) & (P.PlaceTypePropAgeGroup3), P.PlaceTypeNum, 1, 0))
 		{
-			for (i = 0; i < NUM_PLACE_TYPES; i++)
+			for (i = 0; i < PlaceType::Count; i++)
 			{
 				P.PlaceTypePropAgeGroup3[i] = 0;
 				P.PlaceTypeAgeMin3[i] = 0;
@@ -754,7 +754,7 @@ void ReadParams(char* ParamFile, char* PreParamFile)
 		}
 		if (!GetInputParameter2(PreParamFile_dat, AdminFile_dat, "Kernel shape params for place types", "%lf", (void*) & (P.PlaceTypeKernelShape), P.PlaceTypeNum, 1, 0))
 		{
-			for (i = 0; i < NUM_PLACE_TYPES; i++)
+			for (i = 0; i < PlaceType::Count; i++)
 			{
 				P.PlaceTypeKernelShape[i] = P.MoveKernelShape;
 				P.PlaceTypeKernelScale[i] = P.MoveKernelScale;
@@ -764,7 +764,7 @@ void ReadParams(char* ParamFile, char* PreParamFile)
 			GetInputParameter(PreParamFile_dat, AdminFile_dat, "Kernel scale params for place types", "%lf", (void*) & (P.PlaceTypeKernelScale), P.PlaceTypeNum, 1, 0);
 		if (!GetInputParameter2(PreParamFile_dat, AdminFile_dat, "Kernel 3rd param for place types", "%lf", (void*) & (P.PlaceTypeKernelP3), P.PlaceTypeNum, 1, 0))
 		{
-			for (i = 0; i < NUM_PLACE_TYPES; i++)
+			for (i = 0; i < PlaceType::Count; i++)
 			{
 				P.PlaceTypeKernelP3[i] = P.MoveKernelP3;
 				P.PlaceTypeKernelP4[i] = P.MoveKernelP4;
@@ -773,12 +773,12 @@ void ReadParams(char* ParamFile, char* PreParamFile)
 		else
 			GetInputParameter(PreParamFile_dat, AdminFile_dat, "Kernel 4th param for place types", "%lf", (void*) & (P.PlaceTypeKernelP4), P.PlaceTypeNum, 1, 0);
 		if (!GetInputParameter2(PreParamFile_dat, AdminFile_dat, "Number of closest places people pick from (0=all) for place types", "%i", (void*) & (P.PlaceTypeNearestNeighb), P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++)
+			for (i = 0; i < PlaceType::Count; i++)
 				P.PlaceTypeNearestNeighb[i] = 0;
 		if (P.DoAdUnits)
 		{
 			if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Degree to which crossing administrative unit boundaries to go to places is inhibited", "%lf", (void*) & (P.InhibitInterAdunitPlaceAssignment), P.PlaceTypeNum, 1, 0))
-				for (i = 0; i < NUM_PLACE_TYPES; i++)
+				for (i = 0; i < PlaceType::Count; i++)
 					P.InhibitInterAdunitPlaceAssignment[i] = 0;
 		}
 
@@ -845,20 +845,20 @@ void ReadParams(char* ParamFile, char* PreParamFile)
 		GetInputParameter(PreParamFile_dat, AdminFile_dat, "Mean size of place types", "%lf", (void*)P.PlaceTypeMeanSize, P.PlaceTypeNum, 1, 0);
 		GetInputParameter(PreParamFile_dat, AdminFile_dat, "Param 1 of place group size distribution", "%lf", (void*)P.PlaceTypeGroupSizeParam1, P.PlaceTypeNum, 1, 0);
 		if (!GetInputParameter2(PreParamFile_dat, AdminFile_dat, "Power of place size distribution", "%lf", (void*)P.PlaceTypeSizePower, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++)
+			for (i = 0; i < PlaceType::Count; i++)
 				P.PlaceTypeSizePower[i] = 0;
 		//added to enable lognormal distribution - ggilani 09/02/17
 		if (!GetInputParameter2(PreParamFile_dat, AdminFile_dat, "Standard deviation of place size distribution", "%lf", (void*)P.PlaceTypeSizeSD, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++)
+			for (i = 0; i < PlaceType::Count; i++)
 				P.PlaceTypeSizeSD[i] = 0;
 		if (!GetInputParameter2(PreParamFile_dat, AdminFile_dat, "Offset of place size distribution", "%lf", (void*)P.PlaceTypeSizeOffset, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++)
+			for (i = 0; i < PlaceType::Count; i++)
 				P.PlaceTypeSizeOffset[i] = 0;
 		if (!GetInputParameter2(PreParamFile_dat, AdminFile_dat, "Maximum of place size distribution", "%lf", (void*)P.PlaceTypeSizeMax, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++)
+			for (i = 0; i < PlaceType::Count; i++)
 				P.PlaceTypeSizeMax[i] = 1e20;
 		if (!GetInputParameter2(PreParamFile_dat, AdminFile_dat, "Kernel type for place types", "%i", (void*)P.PlaceTypeKernelType, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++)
+			for (i = 0; i < PlaceType::Count; i++)
 				P.PlaceTypeKernelType[i] = P.MoveKernelType;
 		GetInputParameter(PreParamFile_dat, AdminFile_dat, "Place overlap matrix", "%lf", (void*)P.PlaceExclusivityMatrix, P.PlaceTypeNum * P.PlaceTypeNum, 1, 0); //changed from P.PlaceTypeNum,P.PlaceTypeNum,0);
 /* Note P.PlaceExclusivityMatrix not used at present - places assumed exclusive (each person belongs to 0 or 1 place) */
@@ -1026,14 +1026,14 @@ void ReadParams(char* ParamFile, char* PreParamFile)
 			GetInputParameter(ParamFile_dat, PreParamFile_dat, "Relative level of place attendance if symptomatic", "%lf", (void*)P.SymptPlaceTypeContactRate, P.PlaceTypeNum, 1, 0);
 			if (P.DoRealSymptWithdrawal)
 			{
-				for (j = 0; j < NUM_PLACE_TYPES; j++)
+				for (j = 0; j < PlaceType::Count; j++)
 				{
 					P.SymptPlaceTypeWithdrawalProp[j] = 1.0 - P.SymptPlaceTypeContactRate[j];
 					P.SymptPlaceTypeContactRate[j] = 1.0;
 				}
 			}
 			else
-				for (j = 0; j < NUM_PLACE_TYPES; j++) P.SymptPlaceTypeWithdrawalProp[j] = 0.0;
+				for (j = 0; j < PlaceType::Count; j++) P.SymptPlaceTypeWithdrawalProp[j] = 0.0;
 		}
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Maximum age of child at home for whom one adult also stays at home", "%i", (void*)& P.CaseAbsentChildAgeCutoff, 1, 1, 0)) P.CaseAbsentChildAgeCutoff = 0;
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Proportion of children at home for whom one adult also stays at home", "%lf", (void*)& P.CaseAbsentChildPropAdultCarers, 1, 1, 0)) P.CaseAbsentChildPropAdultCarers = 0;
@@ -1288,9 +1288,9 @@ void ReadParams(char* ParamFile, char* PreParamFile)
 	if (P.DoPlaces)
 	{
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Proportion of places treated after case detected", "%lf", (void*)P.TreatPlaceProbCaseId, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++) P.TreatPlaceProbCaseId[i] = 0;
+			for (i = 0; i < PlaceType::Count; i++) P.TreatPlaceProbCaseId[i] = 0;
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Proportion of people treated in targeted places", "%lf", (void*)P.TreatPlaceTotalProp, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++) P.TreatPlaceTotalProp[i] = 0;
+			for (i = 0; i < PlaceType::Count; i++) P.TreatPlaceTotalProp[i] = 0;
 	}
 	if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Maximum number of doses available", "%lf", (void*) & (P.TreatMaxCoursesBase), 1, 1, 0)) P.TreatMaxCoursesBase = 1e20;
 	if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Start time of additional treatment production", "%lf", (void*) & (P.TreatNewCoursesStartTime), 1, 1, 0)) P.TreatNewCoursesStartTime = USHRT_MAX / P.TimeStepsPerDay;
@@ -1506,9 +1506,9 @@ void ReadParams(char* ParamFile, char* PreParamFile)
 	if (P.DoPlaces)
 	{
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Proportion of places remaining open after closure by place type", "%lf", (void*)P.PlaceCloseEffect, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++) P.PlaceCloseEffect[i] = 1;
+			for (i = 0; i < PlaceType::Count; i++) P.PlaceCloseEffect[i] = 1;
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Proportional attendance after closure by place type", "%lf", (void*)P.PlaceClosePropAttending, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++) P.PlaceClosePropAttending[i] = 0;
+			for (i = 0; i < PlaceType::Count; i++) P.PlaceClosePropAttending[i] = 0;		
 	}
 	if (P.DoHouseholds)
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Relative household contact rate after closure", "%lf", (void*)& P.PlaceCloseHouseholdRelContact, 1, 1, 0)) P.PlaceCloseHouseholdRelContact = 1;
@@ -1518,7 +1518,7 @@ void ReadParams(char* ParamFile, char* PreParamFile)
 	if (P.DoHolidays)
 	{
 		if (!GetInputParameter2(PreParamFile_dat, AdminFile_dat, "Proportion of places remaining open during holidays by place type", "%lf", (void*)P.HolidayEffect, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++) P.HolidayEffect[i] = 1;
+			for (i = 0; i < PlaceType::Count; i++) P.HolidayEffect[i] = 1;
 		if (!GetInputParameter2(PreParamFile_dat, AdminFile_dat, "Number of holidays", "%i", (void*) & (P.NumHolidays), 1, 1, 0)) P.NumHolidays = 0;
 		if (P.NumHolidays > DAYS_PER_YEAR) P.NumHolidays = DAYS_PER_YEAR;
 		if (P.NumHolidays > 0)
@@ -1563,13 +1563,13 @@ void ReadParams(char* ParamFile, char* PreParamFile)
 	if (P.DoPlaces)
 	{
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Relative place contact rate given social distancing by place type", "%lf", (void*)P.SocDistPlaceEffect, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++) P.SocDistPlaceEffect[i] = 1;
+			for (i = 0; i < PlaceType::Count; i++) P.SocDistPlaceEffect[i] = 1;
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Relative place contact rate given enhanced social distancing by place type", "%lf", (void*)P.EnhancedSocDistPlaceEffect, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++) P.EnhancedSocDistPlaceEffect[i] = 1;
+			for (i = 0; i < PlaceType::Count; i++) P.EnhancedSocDistPlaceEffect[i] = 1;
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Relative place contact rate given social distancing by place type after change", "%lf", (void*)P.SocDistPlaceEffect2, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++) P.SocDistPlaceEffect2[i] = P.SocDistPlaceEffect[i];
+			for (i = 0; i < PlaceType::Count; i++) P.SocDistPlaceEffect2[i] = P.SocDistPlaceEffect[i];
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Relative place contact rate given enhanced social distancing by place type after change", "%lf", (void*)P.EnhancedSocDistPlaceEffect2, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++) P.EnhancedSocDistPlaceEffect2[i] = P.EnhancedSocDistPlaceEffect[i];
+			for (i = 0; i < PlaceType::Count; i++) P.EnhancedSocDistPlaceEffect2[i] = P.EnhancedSocDistPlaceEffect[i];
 	}
 	if (P.DoHouseholds)
 	{
@@ -1618,7 +1618,7 @@ void ReadParams(char* ParamFile, char* PreParamFile)
 		if (P.DoPlaces)
 		{
 			if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Residual place contacts after household quarantine by place type", "%lf", (void*)P.HQuarantinePlaceEffect, P.PlaceTypeNum, 1, 0))
-				for (i = 0; i < NUM_PLACE_TYPES; i++) P.HQuarantinePlaceEffect[i] = 1;
+				for (i = 0; i < PlaceType::Count; i++) P.HQuarantinePlaceEffect[i] = 1;
 		}
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Residual spatial contacts after household quarantine", "%lf", (void*) & (P.HQuarantineSpatialEffect), 1, 1, 0)) P.HQuarantineSpatialEffect = 1;
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Household level compliance with quarantine", "%lf", (void*) & (P.HQuarantinePropHouseCompliant), 1, 1, 0)) P.HQuarantinePropHouseCompliant = 1;
@@ -1915,9 +1915,9 @@ void ReadParams(char* ParamFile, char* PreParamFile)
 	{
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Number of key workers randomly distributed in the population", "%i", (void*) & (P.KeyWorkerPopNum), 1, 1, 0)) P.KeyWorkerPopNum = 0;
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Number of key workers in different places by place type", "%i", (void*)P.KeyWorkerPlaceNum, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++) P.KeyWorkerPlaceNum[i] = 0;
+			for (i = 0; i < PlaceType::Count; i++) P.KeyWorkerPlaceNum[i] = 0;
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Proportion of staff who are key workers per chosen place by place type", "%lf", (void*)P.KeyWorkerPropInKeyPlaces, P.PlaceTypeNum, 1, 0))
-			for (i = 0; i < NUM_PLACE_TYPES; i++) P.KeyWorkerPropInKeyPlaces[i] = 1.0;
+			for (i = 0; i < PlaceType::Count; i++) P.KeyWorkerPropInKeyPlaces[i] = 1.0;
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Trigger incidence per cell for key worker prophylaxis", "%i", (void*) & (P.KeyWorkerProphCellIncThresh), 1, 1, 0)) P.KeyWorkerProphCellIncThresh = 1000000000;
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Key worker prophylaxis start time", "%lf", (void*) & (P.KeyWorkerProphTimeStartBase), 1, 1, 0)) P.KeyWorkerProphTimeStartBase = USHRT_MAX / P.TimeStepsPerDay;
 		if (!GetInputParameter2(ParamFile_dat, PreParamFile_dat, "Duration of key worker prophylaxis", "%lf", (void*) & (P.KeyWorkerProphDuration), 1, 1, 0)) P.KeyWorkerProphDuration = 0;
@@ -2470,7 +2470,7 @@ void InitModel(int run) // passing run number so we can save run number in the i
 
 	for (i = 0; i < NUM_AGE_GROUPS; i++) State.cumCa[i] = State.cumIa[i] = State.cumDa[i] = 0;
 	for (i = 0; i < 2; i++) State.cumC_keyworker[i] = State.cumI_keyworker[i] = State.cumT_keyworker[i] = 0;
-	for (i = 0; i < NUM_PLACE_TYPES; i++) State.NumPlacesClosed[i] = 0;
+	for (i = 0; i < PlaceType::Count; i++) State.NumPlacesClosed[i] = 0;
 	for (i = 0; i < INFECT_TYPE_MASK; i++) State.cumItype[i] = 0;
 	//initialise cumulative case counts per country to zero: ggilani 12/11/14
 	for (i = 0; i < MAX_COUNTRIES; i++) State.cumC_country[i] = 0;
@@ -2496,7 +2496,7 @@ void InitModel(int run) // passing run number so we can save run number in the i
 		StateT[j].cumT = StateT[j].cumUT = StateT[j].cumTP = StateT[j].cumV = StateT[j].sumRad2 = StateT[j].maxRad2 = StateT[j].cumV_daily =  0;
 		for (i = 0; i < NUM_AGE_GROUPS; i++) StateT[j].cumCa[i] = StateT[j].cumIa[i] = StateT[j].cumDa[i] = 0;
 		for (i = 0; i < 2; i++) StateT[j].cumC_keyworker[i] = StateT[j].cumI_keyworker[i] = StateT[j].cumT_keyworker[i] = 0;
-		for (i = 0; i < NUM_PLACE_TYPES; i++) StateT[j].NumPlacesClosed[i] = 0;
+		for (i = 0; i < PlaceType::Count; i++) StateT[j].NumPlacesClosed[i] = 0;
 		for (i = 0; i < INFECT_TYPE_MASK; i++) StateT[j].cumItype[i] = 0;
 		//initialise cumulative case counts per country per thread to zero: ggilani 12/11/14
 		for (i = 0; i < MAX_COUNTRIES; i++) StateT[j].cumC_country[i] = 0;
@@ -3505,9 +3505,9 @@ void SaveSummaryResults(void) //// calculates and saves summary results (called 
 		sprintf(outname, "%s.controls.xls", OutFile);
 		if(!(dat = fopen(outname, "wb"))) ERR_CRITICAL("Unable to open output file\n");
 		fprintf(dat, "t\tS\tincC\tincTC\tincFC\tincH\tcumT\tcumUT\tcumTP\tcumV\tincHQ\tincAC\tincAH\tincAA\tincACS\tincAPC\tincAPA\tincAPCS\tpropSocDist");
-		for(j = 0; j < NUM_PLACE_TYPES; j++) fprintf(dat, "\tprClosed_%i", j);
+		for(j = 0; j < PlaceType::Count; j++) fprintf(dat, "\tprClosed_%i", j);
 		fprintf(dat, "t\tvS\tvincC\tvincTC\tvincFC\tvincH\tvcumT\tvcumUT\tvcumTP\tvcumV");
-		for(j = 0; j < NUM_PLACE_TYPES; j++) fprintf(dat, "\tvprClosed_%i", j);
+		for(j = 0; j < PlaceType::Count; j++) fprintf(dat, "\tvprClosed_%i", j);
 		fprintf(dat, "\n");
 		for(i = 0; i < P.NumSamples; i++)
 			{
@@ -3516,7 +3516,7 @@ void SaveSummaryResults(void) //// calculates and saves summary results (called 
 				c * TSMean[i].cumT, c * TSMean[i].cumUT, c * TSMean[i].cumTP, c * TSMean[i].cumV, c * TSMean[i].incHQ,
 				c * TSMean[i].incAC, c * TSMean[i].incAH, c * TSMean[i].incAA, c * TSMean[i].incACS,
 				c * TSMean[i].incAPC, c * TSMean[i].incAPA, c * TSMean[i].incAPCS,c*TSMean[i].PropSocDist);
-			for(j = 0; j < NUM_PLACE_TYPES; j++) fprintf(dat, "\t%lf", c * TSMean[i].PropPlacesClosed[j]);
+			for(j = 0; j < PlaceType::Count; j++) fprintf(dat, "\t%lf", c * TSMean[i].PropPlacesClosed[j]);
 			fprintf(dat, "\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf",
 				c * TSVar[i].S - c * c * TSMean[i].S * TSMean[i].S,
 				c * TSVar[i].incC - c * c * TSMean[i].incC * TSMean[i].incC,
@@ -3527,7 +3527,7 @@ void SaveSummaryResults(void) //// calculates and saves summary results (called 
 				c * TSVar[i].cumUT - c * c * TSMean[i].cumUT * TSMean[i].cumUT,
 				c * TSVar[i].cumTP - c * c * TSMean[i].cumTP * TSMean[i].cumTP,
 				c * TSVar[i].cumV - c * c * TSMean[i].cumV * TSMean[i].cumV);
-			for(j = 0; j < NUM_PLACE_TYPES; j++) fprintf(dat, "\t%lf", TSVar[i].PropPlacesClosed[j]);
+			for(j = 0; j < PlaceType::Count; j++) fprintf(dat, "\t%lf", TSVar[i].PropPlacesClosed[j]);
 			fprintf(dat, "\n");
 			}
 		fclose(dat);
@@ -4650,7 +4650,7 @@ void RecordSample(double t, int n)
 		for (i = 0; i < P.NumAdunits; i++)
 			TimeSeries[n].DCT_adunit[i] = (double)AdUnits[i].ndct; //added total numbers of contacts currently isolated due to digital contact tracing: ggilani 11/03/20
 	if (P.DoPlaces)
-		for (i = 0; i < NUM_PLACE_TYPES; i++)
+		for (i = 0; i < PlaceType::Count; i++)
 		{
 			numPC = 0;
 			for (j = 0; j < P.Nplace[i]; j++)
