@@ -17,6 +17,20 @@ class ParamsFile: public ParamReadTest {};
 class PlaceClose: public ParamReadTest {};
 class PreParamsFile: public ParamReadTest {};
 class R0Scale: public ParamReadTest {};
+class MaxThreads: public ParamReadTest {};
+
+TEST_F(MaxThreads, Optional) {
+    args.maxThreads.reset();
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(P().MaxNumThreads, 0);
+}
+TEST_F(MaxThreads, Specified) {
+    args.maxThreads = "2";
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(P().MaxNumThreads, 2);
+}
 
 TEST_F(AdminFile, Specified) {
     args.adminFile = "adminFile.txt";

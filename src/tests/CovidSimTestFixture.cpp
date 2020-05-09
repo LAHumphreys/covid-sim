@@ -5,6 +5,8 @@ void ParseCmdLineArgs(int argc, const char **argv, char *ParamFile, char *Densit
                  char InterventionFile[][1024] , char *PreParamFile, char *buf, char *sep,
                  int &GotPP, int &GotAP, int &GotScF, int &Perr);
 
+void SetupThreads();
+
 void CovidSimTestFixture::CovidSimMainInitialisation() {
     ///// Flags to ensure various parameters have been read; set to false as default.
     GotAP = GotScF = GotPP = 0;
@@ -64,5 +66,9 @@ char *CovidSimTestFixture::OutDensFile() const {
 extern char AdunitFile[1024];
 char *CovidSimTestFixture::AdunitFile() const {
     return ::AdunitFile;
+}
+
+void CovidSimTestFixture::InvokeSetupThreads() {
+    SetupThreads();
 }
 

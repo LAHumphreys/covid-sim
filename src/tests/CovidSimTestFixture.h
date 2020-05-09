@@ -10,6 +10,7 @@ private:
 public:
     void SetUp() override;
     void InvokeReadParam(const std::vector<std::string>& args);
+    void InvokeSetupThreads();
 
 protected:
     param& P();
