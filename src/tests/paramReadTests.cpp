@@ -9,7 +9,7 @@ protected:
 
 class Airports: public ParamReadTest {};
 class CommandLineParams: public ParamReadTest {};
-class DensityFileTests: public ParamReadTest {};
+class DensityFiles: public ParamReadTest {};
 class NetworkFiles: public ParamReadTest {};
 class OutFileBasePath: public ParamReadTest {};
 class ParamsFile: public ParamReadTest {};
@@ -51,19 +51,32 @@ TEST_F(CommandLineParams, NoneProvided) {
     ASSERT_FLOAT_EQ(P().clP6, 0.0);
 }
 
-TEST_F(DensityFileTests, OptionalField) {
+TEST_F(DensityFiles, OptionalField) {
     args.densityFile.reset();
     InvokeReadParam(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().DoHeteroDensity, 0);
 }
-TEST_F(DensityFileTests, SpecifiedFile) {
+TEST_F(DensityFiles, SpecifiedFile) {
     args.densityFile = "density.dat";
     InvokeReadParam(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().DoHeteroDensity, 1);
     ASSERT_EQ(P().DoPeriodicBoundaries, 0);
     ASSERT_STREQ(DensityFile, "density.dat");
+}
+TEST_F(DensityFiles, OutputOptional) {
+    args.densityOutputFile.reset();
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(P().OutputDensFile, 0);
+}
+TEST_F(DensityFiles, OutputSpecified) {
+    args.densityOutputFile = "outputDensity.dat";
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(P().OutputDensFile, 1);
+    ASSERT_STREQ(OutDensFile(), "outputDensity.dat");
 }
 
 TEST_F(OutFileBasePath, Specifed) {

@@ -14,12 +14,16 @@ void CovidSimTestFixture::CovidSimMainInitialisation() {
 }
 
 namespace {
+    constexpr size_t CHAR_BUF_SIZE = 1024;
     param zeroInitialisedParam;
 }
 void CovidSimTestFixture::SetUp() {
     CovidSimMainInitialisation();
-    // Make sure every state starts with P resset to the state it would be in at program start...
+    // Make sure every tests starts with P resset to the state it would be in at program start...
     P() = ::zeroInitialisedParam;
+    memset(OutDensFile(), 0, CHAR_BUF_SIZE);
+    memset(OutFile(), 0, CHAR_BUF_SIZE);
+    memset(OutFileBase(), 0, CHAR_BUF_SIZE);
 }
 
 void CovidSimTestFixture::InvokeReadParam(const std::vector<std::string> &args) {
@@ -49,5 +53,10 @@ char* CovidSimTestFixture::OutFile() const {
 extern char OutFileBase[1024];
 char* CovidSimTestFixture::OutFileBase() const {
     return ::OutFileBase;
+}
+
+extern char OutDensFile[1024];
+char *CovidSimTestFixture::OutDensFile() const {
+    return ::OutDensFile;
 }
 
