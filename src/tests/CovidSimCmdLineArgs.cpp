@@ -3,21 +3,36 @@
 //
 
 #include "CovidSimCmdLineArgs.h"
+#include <sstream>
 
 std::vector<std::string> CovidSimCmdLineArgs::BuildCmdLine() const {
     std::vector<std::string> args ={
-            "/C:1",
-            "/PP:preUK_R0=2.0.txt",
-            "/P:p_NoInt.txt",
-            "/CLP1:100000",
-            "/CLP2:0",
-            "/O:NoInt_R0=2.2",
-            "/D:wpop_file",
-            "/M:wpop_bin",
-            "/A:sample_admin.txt",
-            "/S:NetworkUKN_32T_100th.bin",
-            "/R:1.1"
+            "CovidSim"
     };
+    const auto addOptionalArg = [&](const std::string& argSwitch, const std::optional<std::string>& argField) -> void {
+        if (argField.has_value()) {
+            args.push_back(std::string("/") + argSwitch + ":" + argField.value());
+        }
+    };
+    addOptionalArg("A", adminFile);
+    addOptionalArg("AP", airTravelFile);
+    addOptionalArg("C", placeCloseIndepThreshold);
+    addOptionalArg("D", densityFile);
+    addOptionalArg("L", networkFileToLoad);
+    addOptionalArg("M", densityOutputFile);
+    addOptionalArg("O", outFileBasePath);
+    addOptionalArg("P", paramFile);
+    addOptionalArg("PP", preParamFile);
+    addOptionalArg("R", r0);
+    addOptionalArg("S", networkFileToSave);
+
+    std::stringstream paramName;
+    for (size_t i = 0; i < NUM_CMD_LINE_PARAMS; ++i) {
+        paramName.str("");
+        paramName << "CLP" << (i+1);
+        addOptionalArg(paramName.str(), cmdLineParam[i]);
+    }
+
     args.push_back(setupSeeds[0]);
     args.push_back(setupSeeds[1]);
     args.push_back(runSeeds[0]);
