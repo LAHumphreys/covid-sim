@@ -6,7 +6,7 @@
 
 std::vector<std::string> CovidSimCmdLineArgs::BuildCmdLine() const {
     std::vector<std::string> args ={
-            "/C:1",
+            "CovidSim",
             "/PP:preUK_R0=2.0.txt",
             "/P:p_NoInt.txt",
             "/CLP1:100000",
@@ -18,6 +18,9 @@ std::vector<std::string> CovidSimCmdLineArgs::BuildCmdLine() const {
             "/S:NetworkUKN_32T_100th.bin",
             "/R:1.1"
     };
+    if (placeCloseIndepThreshold.has_value()) {
+        args.push_back(std::string("/C:") + placeCloseIndepThreshold.value());
+    }
     args.push_back(setupSeeds[0]);
     args.push_back(setupSeeds[1]);
     args.push_back(runSeeds[0]);

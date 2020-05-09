@@ -7,6 +7,23 @@ class ParamReadTest: public CovidSimTestFixture {
 public:
 };
 
+class PlaceClose: public ParamReadTest {};
+class NetworkFile: public ParamReadTest {};
+
+TEST_F(PlaceClose, IndepThreashold_Default) {
+    CovidSimCmdLineArgs args;
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(P().PlaceCloseIndepThresh, 0L);
+}
+TEST_F(PlaceClose, IndepThreashold_Enabled) {
+    CovidSimCmdLineArgs args;
+    args.placeCloseIndepThreshold = "1";
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(P().PlaceCloseIndepThresh, 1L);
+}
+
 TEST_F(ParamReadTest, DefaultArgs) {
     CovidSimCmdLineArgs args;
     InvokeReadParam(args.BuildCmdLine());
