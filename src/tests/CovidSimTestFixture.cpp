@@ -24,6 +24,7 @@ void CovidSimTestFixture::SetUp() {
     memset(OutDensFile(), 0, CHAR_BUF_SIZE);
     memset(OutFile(), 0, CHAR_BUF_SIZE);
     memset(OutFileBase(), 0, CHAR_BUF_SIZE);
+    memset(AdunitFile(), 0, CHAR_BUF_SIZE);
 }
 
 void CovidSimTestFixture::InvokeReadParam(const std::vector<std::string> &args) {
@@ -58,5 +59,10 @@ char* CovidSimTestFixture::OutFileBase() const {
 extern char OutDensFile[1024];
 char *CovidSimTestFixture::OutDensFile() const {
     return ::OutDensFile;
+}
+
+extern char AdunitFile[1024];
+char *CovidSimTestFixture::AdunitFile() const {
+    return ::AdunitFile;
 }
 

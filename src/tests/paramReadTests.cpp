@@ -7,6 +7,7 @@ protected:
     CovidSimCmdLineArgs args;
 };
 
+class AdminFile: public ParamReadTest {};
 class Airports: public ParamReadTest {};
 class CommandLineParams: public ParamReadTest {};
 class DensityFiles: public ParamReadTest {};
@@ -15,6 +16,19 @@ class OutFileBasePath: public ParamReadTest {};
 class ParamsFile: public ParamReadTest {};
 class PreParamsFile: public ParamReadTest {};
 class PlaceClose: public ParamReadTest {};
+
+TEST_F(AdminFile, Specified) {
+    args.adminFile = "adminFile.txt";
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_STREQ(AdunitFile(), "adminFile.txt");
+}
+TEST_F(AdminFile, Optional) {
+    args.adminFile.reset();
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(AdunitFile()[0], 0);
+}
 
 TEST_F(CommandLineParams, AllProvided) {
     args.cmdLineParam[0] = "1.0";

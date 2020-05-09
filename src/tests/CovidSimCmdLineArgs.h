@@ -7,6 +7,7 @@
 struct CovidSimCmdLineArgs {
     static constexpr size_t NUM_CMD_LINE_PARAMS = 6;
 
+    std::optional<std::string> adminFile;
     std::optional<std::string> airTravelFile;
     std::optional<std::string> cmdLineParam[NUM_CMD_LINE_PARAMS];
     std::optional<std::string> densityFile;
