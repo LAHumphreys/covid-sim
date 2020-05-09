@@ -15,12 +15,17 @@ std::vector<std::string> CovidSimCmdLineArgs::BuildCmdLine() const {
             "/D:wpop_file",
             "/M:wpop_bin",
             "/A:sample_admin.txt",
-            "/S:NetworkUKN_32T_100th.bin",
             "/R:1.1"
     };
-    if (placeCloseIndepThreshold.has_value()) {
-        args.push_back(std::string("/C:") + placeCloseIndepThreshold.value());
-    }
+    const auto addOptionalArg = [&](const std::string& argSwitch, const std::optional<std::string>& argField) -> void {
+        if (argField.has_value()) {
+            args.push_back(std::string("/") + argSwitch + ":" + argField.value());
+        }
+    };
+    addOptionalArg("C", placeCloseIndepThreshold);
+    addOptionalArg("L", networkFileToLoad);
+    addOptionalArg("S", networkFileToSave);
+
     args.push_back(setupSeeds[0]);
     args.push_back(setupSeeds[1]);
     args.push_back(runSeeds[0]);

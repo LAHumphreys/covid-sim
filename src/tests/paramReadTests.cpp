@@ -4,25 +4,52 @@
 #include "Param.h"
 
 class ParamReadTest: public CovidSimTestFixture {
-public:
+protected:
+    CovidSimCmdLineArgs args;
 };
 
 class PlaceClose: public ParamReadTest {};
-class NetworkFile: public ParamReadTest {};
+class NetworkFiles: public ParamReadTest {};
 
 TEST_F(PlaceClose, IndepThreashold_Default) {
-    CovidSimCmdLineArgs args;
     InvokeReadParam(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().PlaceCloseIndepThresh, 0L);
 }
 TEST_F(PlaceClose, IndepThreashold_Enabled) {
-    CovidSimCmdLineArgs args;
     args.placeCloseIndepThreshold = "1";
     InvokeReadParam(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().PlaceCloseIndepThresh, 1L);
 }
+
+TEST_F(NetworkFiles, Default) {
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(P().LoadSaveNetwork, 0);
+}
+TEST_F(NetworkFiles, LoadFile) {
+    args.networkFileToLoad = "fileToLoad";
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(P().LoadSaveNetwork, 1);
+    ASSERT_STREQ(NetworkFile, "fileToLoad");
+}
+TEST_F(NetworkFiles, SaveFile) {
+    args.networkFileToLoad = "fileToSave";
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(P().LoadSaveNetwork, 1);
+    ASSERT_STREQ(NetworkFile, "fileToSave");
+}
+TEST_F(NetworkFiles, NotBothLoadAndSave) {
+    args.networkFileToSave = "fileToSave";
+    args.networkFileToLoad = "fileToLoad";
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_TRUE(Perr);
+}
+
+// TODO: Both Load and Save
 
 TEST_F(ParamReadTest, DefaultArgs) {
     CovidSimCmdLineArgs args;
@@ -51,3 +78,4 @@ TEST_F(ParamReadTest, RunTimeSeeds) {
     ASSERT_EQ(P().runSeed1, 123);
     ASSERT_EQ(P().runSeed2, 456);
 }
+// TODO: Currently the commandline handler has no handling for bas seed arguments
