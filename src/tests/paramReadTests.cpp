@@ -8,9 +8,22 @@ protected:
     CovidSimCmdLineArgs args;
 };
 
+class ParamsFile: public ParamReadTest {};
 class PlaceClose: public ParamReadTest {};
 class NetworkFiles: public ParamReadTest {};
 class Airports: public ParamReadTest {};
+
+TEST_F(ParamsFile, ParamFileSet) {
+    args.paramFile = "testParams.txt";
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_STREQ(ParamFile, "testParams.txt");
+}
+TEST_F(ParamsFile, MandatoryField) {
+    args.paramFile.reset();
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_TRUE(Perr);
+}
 
 TEST_F(PlaceClose, IndepThreashold_Default) {
     InvokeReadParam(args.BuildCmdLine());
