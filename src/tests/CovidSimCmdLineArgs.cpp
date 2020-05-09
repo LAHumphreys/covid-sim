@@ -25,6 +25,7 @@ std::vector<std::string> CovidSimCmdLineArgs::BuildCmdLine() const {
     addOptionalArg("C", placeCloseIndepThreshold);
     addOptionalArg("L", networkFileToLoad);
     addOptionalArg("S", networkFileToSave);
+    addOptionalArg("AP", airTravelFile);
 
     args.push_back(setupSeeds[0]);
     args.push_back(setupSeeds[1]);

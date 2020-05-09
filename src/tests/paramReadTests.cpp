@@ -10,6 +10,7 @@ protected:
 
 class PlaceClose: public ParamReadTest {};
 class NetworkFiles: public ParamReadTest {};
+class Airports: public ParamReadTest {};
 
 TEST_F(PlaceClose, IndepThreashold_Default) {
     InvokeReadParam(args.BuildCmdLine());
@@ -48,8 +49,18 @@ TEST_F(NetworkFiles, NotBothLoadAndSave) {
     InvokeReadParam(args.BuildCmdLine());
     ASSERT_TRUE(Perr);
 }
-
-// TODO: Both Load and Save
+TEST_F(Airports, Default) {
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(GotAP, 0);
+}
+TEST_F(Airports, SpecifyAirportFile ) {
+    args.airTravelFile = "airTravel.dat";
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(GotAP, 1);
+    ASSERT_STREQ(AirTravelFile, "airTravel.dat");
+}
 
 TEST_F(ParamReadTest, DefaultArgs) {
     CovidSimCmdLineArgs args;

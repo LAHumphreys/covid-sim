@@ -208,7 +208,7 @@ ParseCmdLineArgs(int argc, const char** argv, char *ParamFile, char *DensityFile
             else if (argv[i][1] == 'A' && argv[i][2] == 'P' && argv[i][3] == ':')
             {
                 GotAP = 1;
-                sscanf(&argv[i][3], "%s", AirTravelFile);
+                sscanf(&argv[i][4], "%s", AirTravelFile);
             }
             else if (argv[i][1] == 's' && argv[i][2] == ':')
             {
