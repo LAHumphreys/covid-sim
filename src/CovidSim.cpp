@@ -113,14 +113,14 @@ int PlaceDistDistrib[NUM_PLACE_TYPES][MAX_DIST], PlaceSizeDistrib[NUM_PLACE_TYPE
 void
 ParseCmdLineArgs(int argc, const char** argv, char *ParamFile, char *DensityFile, char *NetworkFile,
                  char *AirTravelFile, char *SchoolFile, char *RegDemogFile,
-                 char InterventionFile[][1024] , char *PreParamFile, char *buf, char *sep, int i,
+                 char InterventionFile[][1024] , char *PreParamFile, char *buf, char *sep,
                  int &GotPP, int &GotAP, int &GotScF, int &Perr) {
     int GotL = 0, GotS = 0, GotO = 0, GotP = 0;
     if (argc < 7) Perr = 1;
     else
     {
         ///// Get seeds.
-        i = argc - 4;
+        int i = argc - 4;
         sscanf(argv[i], "%li", &P.setupSeed1);
         sscanf(argv[i + 1], "%li", &P.setupSeed2);
         sscanf(argv[i + 2], "%li", &P.runSeed1);
@@ -287,7 +287,7 @@ int _main(int argc, const char* argv[])
 
     ParseCmdLineArgs(argc, argv, ParamFile, DensityFile, NetworkFile, AirTravelFile, SchoolFile, RegDemogFile,
                      InterventionFile,
-                     PreParamFile, buf, sep, i, GotPP, GotAP, GotScF, Perr);
+                     PreParamFile, buf, sep, GotPP, GotAP, GotScF, Perr);
 
     ///// END Read in command line arguments
 
