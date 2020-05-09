@@ -1,0 +1,19 @@
+sudo: false
+
+dist: bionic
+
+addons:
+  apt:
+    packages:
+      - cmake
+      - cmake-data
+      - build-essential
+
+branches:
+  only:
+    - master
+
+script: 
+  - ./cleanBuildTests.sh
+  - cd tests
+  - ./regressiontest_UK_100th.py

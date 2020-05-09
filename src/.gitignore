@@ -1,3 +1,6 @@
 CovidSim
 CMakeSettings.json
 *.o
+
+.idea
+cmake-build-*
