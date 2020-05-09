@@ -110,7 +110,7 @@ int PlaceDistDistrib[NUM_PLACE_TYPES][MAX_DIST], PlaceSizeDistrib[NUM_PLACE_TYPE
 /* int NumPC,NumPCD; */
 #define MAXINTFILE 10
 
-int main(int argc, char* argv[])
+int _main(int argc, char* argv[])
 {
 	char ParamFile[1024]{}, DensityFile[1024]{}, NetworkFile[1024]{}, AirTravelFile[1024]{}, SchoolFile[1024]{}, RegDemogFile[1024]{}, InterventionFile[MAXINTFILE][1024]{}, PreParamFile[1024]{}, buf[2048]{}, * sep;
 	int i, GotP, GotPP, GotO, GotL, GotS, GotAP, GotScF, Perr, cl;
@@ -427,6 +427,8 @@ int main(int argc, char* argv[])
 	fprintf(stderr, "Extinction in %i out of %i runs\n", P.NRactE, P.NRactNE + P.NRactE);
 	fprintf(stderr, "Model ran in %lf seconds\n", ((double)(clock() - cl)) / CLOCKS_PER_SEC);
 	fprintf(stderr, "Model finished\n");
+
+	return 0;
 }
 
 
