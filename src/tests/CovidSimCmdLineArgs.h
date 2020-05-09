@@ -5,7 +5,10 @@
 #include <optional>
 
 struct CovidSimCmdLineArgs {
+    static constexpr size_t NUM_CMD_LINE_PARAMS = 6;
+
     std::optional<std::string> airTravelFile;
+    std::optional<std::string> cmdLineParam[NUM_CMD_LINE_PARAMS];
     std::optional<std::string> networkFileToLoad;
     std::optional<std::string> networkFileToSave;
     std::optional<std::string> outFileBasePath = "results_";

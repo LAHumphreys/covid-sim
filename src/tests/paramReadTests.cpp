@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include "CovidSimTestFixture.h"
 #include "CovidSimCmdLineArgs.h"
-#include "Param.h"
 
 class ParamReadTest: public CovidSimTestFixture {
 protected:
@@ -9,11 +8,47 @@ protected:
 };
 
 class Airports: public ParamReadTest {};
+class CommandLineParams: public ParamReadTest {};
 class NetworkFiles: public ParamReadTest {};
 class OutFileBasePath: public ParamReadTest {};
 class ParamsFile: public ParamReadTest {};
 class PreParamsFile: public ParamReadTest {};
 class PlaceClose: public ParamReadTest {};
+
+TEST_F(CommandLineParams, AllProvided) {
+    args.cmdLineParam[0] = "1.0";
+    args.cmdLineParam[1] = "1.1";
+    args.cmdLineParam[2] = "1.2";
+    args.cmdLineParam[3] = "1.3";
+    args.cmdLineParam[4] = "1.4";
+    args.cmdLineParam[5] = "1.5";
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_FLOAT_EQ(P().clP1, 1.0);
+    ASSERT_FLOAT_EQ(P().clP1, 1.0);
+    ASSERT_FLOAT_EQ(P().clP2, 1.1);
+    ASSERT_FLOAT_EQ(P().clP3, 1.2);
+    ASSERT_FLOAT_EQ(P().clP4, 1.3);
+    ASSERT_FLOAT_EQ(P().clP5, 1.4);
+    ASSERT_FLOAT_EQ(P().clP6, 1.5);
+}
+TEST_F(CommandLineParams, NoneProvided) {
+    args.cmdLineParam[0].reset();
+    args.cmdLineParam[1].reset();
+    args.cmdLineParam[2].reset();
+    args.cmdLineParam[3].reset();
+    args.cmdLineParam[4].reset();
+    args.cmdLineParam[5].reset();
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_FLOAT_EQ(P().clP1, 0.0);
+    ASSERT_FLOAT_EQ(P().clP1, 0.0);
+    ASSERT_FLOAT_EQ(P().clP2, 0.0);
+    ASSERT_FLOAT_EQ(P().clP3, 0.0);
+    ASSERT_FLOAT_EQ(P().clP4, 0.0);
+    ASSERT_FLOAT_EQ(P().clP5, 0.0);
+    ASSERT_FLOAT_EQ(P().clP6, 0.0);
+}
 
 TEST_F(OutFileBasePath, Specifed) {
     args.outFileBasePath = "results_";

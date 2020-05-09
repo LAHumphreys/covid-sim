@@ -13,8 +13,13 @@ void CovidSimTestFixture::CovidSimMainInitialisation() {
     fprintf(stderr, "sizeof(int)=%i sizeof(long)=%i sizeof(float)=%i sizeof(double)=%i sizeof(unsigned short int)=%i sizeof(int *)=%i\n", (int)sizeof(int), (int)sizeof(long), (int)sizeof(float), (int)sizeof(double), (int)sizeof(unsigned short int), (int)sizeof(int*));
 }
 
+namespace {
+    param zeroInitialisedParam;
+}
 void CovidSimTestFixture::SetUp() {
     CovidSimMainInitialisation();
+    // Make sure every state starts with P resset to the state it would be in at program start...
+    P() = ::zeroInitialisedParam;
 }
 
 void CovidSimTestFixture::InvokeReadParam(const std::vector<std::string> &args) {
