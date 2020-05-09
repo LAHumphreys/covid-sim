@@ -9,6 +9,7 @@ protected:
 
 class Airports: public ParamReadTest {};
 class CommandLineParams: public ParamReadTest {};
+class DensityFileTests: public ParamReadTest {};
 class NetworkFiles: public ParamReadTest {};
 class OutFileBasePath: public ParamReadTest {};
 class ParamsFile: public ParamReadTest {};
@@ -48,6 +49,21 @@ TEST_F(CommandLineParams, NoneProvided) {
     ASSERT_FLOAT_EQ(P().clP4, 0.0);
     ASSERT_FLOAT_EQ(P().clP5, 0.0);
     ASSERT_FLOAT_EQ(P().clP6, 0.0);
+}
+
+TEST_F(DensityFileTests, OptionalField) {
+    args.densityFile.reset();
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(P().DoHeteroDensity, 0);
+}
+TEST_F(DensityFileTests, SpecifiedFile) {
+    args.densityFile = "density.dat";
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(P().DoHeteroDensity, 1);
+    ASSERT_EQ(P().DoPeriodicBoundaries, 0);
+    ASSERT_STREQ(DensityFile, "density.dat");
 }
 
 TEST_F(OutFileBasePath, Specifed) {

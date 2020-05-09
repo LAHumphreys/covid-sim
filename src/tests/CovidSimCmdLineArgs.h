@@ -9,6 +9,7 @@ struct CovidSimCmdLineArgs {
 
     std::optional<std::string> airTravelFile;
     std::optional<std::string> cmdLineParam[NUM_CMD_LINE_PARAMS];
+    std::optional<std::string> densityFile;
     std::optional<std::string> networkFileToLoad;
     std::optional<std::string> networkFileToSave;
     std::optional<std::string> outFileBasePath = "results_";

@@ -8,7 +8,6 @@
 std::vector<std::string> CovidSimCmdLineArgs::BuildCmdLine() const {
     std::vector<std::string> args ={
             "CovidSim",
-            "/D:wpop_file",
             "/M:wpop_bin",
             "/A:sample_admin.txt",
             "/R:1.1"
@@ -18,6 +17,7 @@ std::vector<std::string> CovidSimCmdLineArgs::BuildCmdLine() const {
             args.push_back(std::string("/") + argSwitch + ":" + argField.value());
         }
     };
+    addOptionalArg("D", densityFile);
     addOptionalArg("AP", airTravelFile);
     addOptionalArg("C", placeCloseIndepThreshold);
     addOptionalArg("L", networkFileToLoad);
