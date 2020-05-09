@@ -110,7 +110,167 @@ int PlaceDistDistrib[NUM_PLACE_TYPES][MAX_DIST], PlaceSizeDistrib[NUM_PLACE_TYPE
 /* int NumPC,NumPCD; */
 #define MAXINTFILE 10
 
-int _main(int argc, char* argv[])
+void
+ParseCmdLineArgs(int argc, const char** argv, char *ParamFile, char *DensityFile, char *NetworkFile,
+                 char *AirTravelFile, char *SchoolFile, char *RegDemogFile,
+                 char InterventionFile[][1024] , char *PreParamFile, char *buf, char *sep, int i, int GotP,
+                 int GotO, int GotL, int GotS, int &GotPP, int &GotAP, int &GotScF, int &Perr) {
+    if (argc < 7) Perr = 1;
+    else
+    {
+        ///// Get seeds.
+        i = argc - 4;
+        sscanf(argv[i], "%li", &P.setupSeed1);
+        sscanf(argv[i + 1], "%li", &P.setupSeed2);
+        sscanf(argv[i + 2], "%li", &P.runSeed1);
+        sscanf(argv[i + 3], "%li", &P.runSeed2);
+
+        ///// Set parameter defaults - read them in after
+        P.PlaceCloseIndepThresh = P.LoadSaveNetwork = P.DoHeteroDensity = P.DoPeriodicBoundaries = P.DoSchoolFile = P.DoAdunitDemog = P.OutputDensFile = P.MaxNumThreads = P.DoInterventionFile = 0;
+        P.PreControlClusterIdCaseThreshold = 0;
+        P.R0scale = 1.0;
+        P.KernelOffsetScale = P.KernelPowerScale = 1.0; //added this so that kernel parameters are only changed if input from the command line: ggilani - 15/10/2014
+        P.DoSaveSnapshot = P.DoLoadSnapshot  = 0;
+
+        //// scroll through command line arguments, anticipating what they can be using various if statements.
+        for (i = 1; i < argc - 4; i++)
+        {
+            if ((argv[i][0] != '/') && ((argv[i][2] != ':') && (argv[i][3] != ':'))) Perr = 1;
+            if (argv[i][1] == 'P' && argv[i][2] == ':')
+            {
+                GotP = 1;
+                sscanf(&argv[i][3], "%s", ParamFile);
+            }
+            else if (argv[i][1] == 'O' && argv[i][2] == ':')
+            {
+                GotO = 1;
+                sscanf(&argv[i][3], "%s", OutFileBase);
+            }
+            else if (argv[i][1] == 'D' && argv[i][2] == ':')
+            {
+                sscanf(&argv[i][3], "%s", DensityFile);
+                P.DoHeteroDensity = 1;
+                P.DoPeriodicBoundaries = 0;
+            }
+            else if (argv[i][1] == 'A' && argv[i][2] == ':')
+            {
+                sscanf(&argv[i][3], "%s", AdunitFile);
+            }
+            else if (argv[i][1] == 'L' && argv[i][2] == ':')
+            {
+                GotL = 1;
+                P.LoadSaveNetwork = 1;
+                sscanf(&argv[i][3], "%s", NetworkFile);
+            }
+            else if (argv[i][1] == 'S' && argv[i][2] == ':')
+            {
+                P.LoadSaveNetwork = 2;
+                GotS = 1;
+                sscanf(&argv[i][3], "%s", NetworkFile);
+            }
+            else if (argv[i][1] == 'R' && argv[i][2] == ':')
+            {
+                sscanf(&argv[i][3], "%lf", &P.R0scale);
+            }
+            else if (argv[i][1] == 'K' && argv[i][2] == 'P' && argv[i][3] == ':') //added Kernel Power and Offset scaling so that it can easily be altered from the command line in order to vary the kernel quickly: ggilani - 15/10/14
+            {
+                sscanf(&argv[i][4], "%lf", &P.KernelPowerScale);
+            }
+            else if (argv[i][1] == 'K' && argv[i][2] == 'O' && argv[i][3] == ':')
+            {
+                sscanf(&argv[i][4], "%lf", &P.KernelOffsetScale);
+            }
+            else if (argv[i][1] == 'C' && argv[i][2] == 'L' && argv[i][3] == 'P' && argv[i][4] == '1' && argv[i][5] == ':') // generic command line specified param - matched to #1 in param file
+            {
+                sscanf(&argv[i][6], "%lf", &P.clP1);
+            }
+            else if (argv[i][1] == 'C' && argv[i][2] == 'L' && argv[i][3] == 'P' && argv[i][4] == '2' && argv[i][5] == ':') // generic command line specified param - matched to #2 in param file
+            {
+                sscanf(&argv[i][6], "%lf", &P.clP2);
+            }
+            else if(argv[i][1] == 'C' && argv[i][2] == 'L' && argv[i][3] == 'P' && argv[i][4] == '3' && argv[i][5] == ':') // generic command line specified param - matched to #3 in param file
+                {
+                sscanf(&argv[i][6], "%lf", &P.clP3);
+                }
+            else if(argv[i][1] == 'C' && argv[i][2] == 'L' && argv[i][3] == 'P' && argv[i][4] == '4' && argv[i][5] == ':') // generic command line specified param - matched to #4 in param file
+                {
+                sscanf(&argv[i][6], "%lf", &P.clP4);
+                }
+            else if(argv[i][1] == 'C' && argv[i][2] == 'L' && argv[i][3] == 'P' && argv[i][4] == '5' && argv[i][5] == ':') // generic command line specified param - matched to #5 in param file
+                {
+                sscanf(&argv[i][6], "%lf", &P.clP5);
+                }
+            else if(argv[i][1] == 'C' && argv[i][2] == 'L' && argv[i][3] == 'P' && argv[i][4] == '6' && argv[i][5] == ':') // generic command line specified param - matched to #6 in param file
+                {
+                sscanf(&argv[i][6], "%lf", &P.clP6);
+                }
+            else if (argv[i][1] == 'A' && argv[i][2] == 'P' && argv[i][3] == ':')
+            {
+                GotAP = 1;
+                sscanf(&argv[i][3], "%s", AirTravelFile);
+            }
+            else if (argv[i][1] == 's' && argv[i][2] == ':')
+            {
+                GotScF = 1;
+                sscanf(&argv[i][3], "%s", SchoolFile);
+            }
+            else if (argv[i][1] == 'T' && argv[i][2] == ':')
+            {
+                sscanf(&argv[i][3], "%i", &P.PreControlClusterIdCaseThreshold);
+            }
+            else if (argv[i][1] == 'C' && argv[i][2] == ':')
+            {
+                sscanf(&argv[i][3], "%i", &P.PlaceCloseIndepThresh);
+            }
+            else if (argv[i][1] == 'd' && argv[i][2] == ':')
+            {
+                P.DoAdunitDemog = 1;
+                sscanf(&argv[i][3], "%s", RegDemogFile);
+            }
+            else if (argv[i][1] == 'c' && argv[i][2] == ':')
+            {
+                sscanf(&argv[i][3], "%i", &P.MaxNumThreads);
+            }
+            else if (argv[i][1] == 'M' && argv[i][2] == ':')
+            {
+                P.OutputDensFile = 1;
+                sscanf(&argv[i][3], "%s", OutDensFile);
+            }
+            else if (argv[i][1] == 'I' && argv[i][2] == ':')
+            {
+                sscanf(&argv[i][3], "%s", InterventionFile[P.DoInterventionFile]);
+                P.DoInterventionFile++;
+            }
+            else if (argv[i][1] == 'L' && argv[i][2] == 'S' && argv[i][3] == ':')
+            {
+                sscanf(&argv[i][4], "%s", SnapshotLoadFile);
+                P.DoLoadSnapshot = 1;
+            }
+            else if (argv[i][1] == 'P' && argv[i][2] == 'P' && argv[i][3] == ':')
+            {
+                sscanf(&argv[i][4], "%s", PreParamFile);
+                GotPP = 1;
+            }
+            else if (argv[i][1] == 'S' && argv[i][2] == 'S' && argv[i][3] == ':')
+            {
+                sscanf(&argv[i][4], "%s", buf);
+                fprintf(stderr, "### %s\n", buf);
+                sep = strchr(buf, ',');
+                if (!sep)
+                    Perr = 1;
+                else
+                {
+                    P.DoSaveSnapshot = 1;
+                    *sep = ' ';
+                    sscanf(buf, "%lf %s", &(P.SnapshotSaveTime), SnapshotSaveFile);
+                }
+            }
+        }
+        if (((GotS) && (GotL)) || (!GotP) || (!GotO)) Perr = 1;
+    }
+}
+
+int _main(int argc, const char* argv[])
 {
 	char ParamFile[1024]{}, DensityFile[1024]{}, NetworkFile[1024]{}, AirTravelFile[1024]{}, SchoolFile[1024]{}, RegDemogFile[1024]{}, InterventionFile[MAXINTFILE][1024]{}, PreParamFile[1024]{}, buf[2048]{}, * sep;
 	int i, GotP, GotPP, GotO, GotL, GotS, GotAP, GotScF, Perr, cl;
@@ -124,161 +284,11 @@ int _main(int argc, char* argv[])
 
 	///// Read in command line arguments - lots of things, e.g. random number seeds; (pre)parameter files; binary files; population data; output directory? etc.
 
-	if (argc < 7)	Perr = 1;
-	else
-	{
-		///// Get seeds.
-		i = argc - 4;
-		sscanf(argv[i], "%li", &P.setupSeed1);
-		sscanf(argv[i + 1], "%li", &P.setupSeed2);
-		sscanf(argv[i + 2], "%li", &P.runSeed1);
-		sscanf(argv[i + 3], "%li", &P.runSeed2);
+    ParseCmdLineArgs(argc, argv, ParamFile, DensityFile, NetworkFile, AirTravelFile, SchoolFile, RegDemogFile,
+                     InterventionFile,
+                     PreParamFile, buf, sep, i, GotP, GotO, GotL, GotS, GotPP, GotAP, GotScF, Perr);
 
-		///// Set parameter defaults - read them in after
-		P.PlaceCloseIndepThresh = P.LoadSaveNetwork = P.DoHeteroDensity = P.DoPeriodicBoundaries = P.DoSchoolFile = P.DoAdunitDemog = P.OutputDensFile = P.MaxNumThreads = P.DoInterventionFile = 0;
-		P.PreControlClusterIdCaseThreshold = 0;
-		P.R0scale = 1.0;
-		P.KernelOffsetScale = P.KernelPowerScale = 1.0; //added this so that kernel parameters are only changed if input from the command line: ggilani - 15/10/2014
-		P.DoSaveSnapshot = P.DoLoadSnapshot  = 0;
-
-		//// scroll through command line arguments, anticipating what they can be using various if statements.
-		for (i = 1; i < argc - 4; i++)
-		{
-			if ((argv[i][0] != '/') && ((argv[i][2] != ':') && (argv[i][3] != ':'))) Perr = 1;
-			if (argv[i][1] == 'P' && argv[i][2] == ':')
-			{
-				GotP = 1;
-				sscanf(&argv[i][3], "%s", ParamFile);
-			}
-			else if (argv[i][1] == 'O' && argv[i][2] == ':')
-			{
-				GotO = 1;
-				sscanf(&argv[i][3], "%s", OutFileBase);
-			}
-			else if (argv[i][1] == 'D' && argv[i][2] == ':')
-			{
-				sscanf(&argv[i][3], "%s", DensityFile);
-				P.DoHeteroDensity = 1;
-				P.DoPeriodicBoundaries = 0;
-			}
-			else if (argv[i][1] == 'A' && argv[i][2] == ':')
-			{
-				sscanf(&argv[i][3], "%s", AdunitFile);
-			}
-			else if (argv[i][1] == 'L' && argv[i][2] == ':')
-			{
-				GotL = 1;
-				P.LoadSaveNetwork = 1;
-				sscanf(&argv[i][3], "%s", NetworkFile);
-			}
-			else if (argv[i][1] == 'S' && argv[i][2] == ':')
-			{
-				P.LoadSaveNetwork = 2;
-				GotS = 1;
-				sscanf(&argv[i][3], "%s", NetworkFile);
-			}
-			else if (argv[i][1] == 'R' && argv[i][2] == ':')
-			{
-				sscanf(&argv[i][3], "%lf", &P.R0scale);
-			}
-			else if (argv[i][1] == 'K' && argv[i][2] == 'P' && argv[i][3] == ':') //added Kernel Power and Offset scaling so that it can easily be altered from the command line in order to vary the kernel quickly: ggilani - 15/10/14
-			{
-				sscanf(&argv[i][4], "%lf", &P.KernelPowerScale);
-			}
-			else if (argv[i][1] == 'K' && argv[i][2] == 'O' && argv[i][3] == ':')
-			{
-				sscanf(&argv[i][4], "%lf", &P.KernelOffsetScale);
-			}
-			else if (argv[i][1] == 'C' && argv[i][2] == 'L' && argv[i][3] == 'P' && argv[i][4] == '1' && argv[i][5] == ':') // generic command line specified param - matched to #1 in param file
-			{
-				sscanf(&argv[i][6], "%lf", &P.clP1);
-			}
-			else if (argv[i][1] == 'C' && argv[i][2] == 'L' && argv[i][3] == 'P' && argv[i][4] == '2' && argv[i][5] == ':') // generic command line specified param - matched to #2 in param file
-			{
-				sscanf(&argv[i][6], "%lf", &P.clP2);
-			}
-			else if(argv[i][1] == 'C' && argv[i][2] == 'L' && argv[i][3] == 'P' && argv[i][4] == '3' && argv[i][5] == ':') // generic command line specified param - matched to #3 in param file
-				{
-				sscanf(&argv[i][6], "%lf", &P.clP3);
-				}
-			else if(argv[i][1] == 'C' && argv[i][2] == 'L' && argv[i][3] == 'P' && argv[i][4] == '4' && argv[i][5] == ':') // generic command line specified param - matched to #4 in param file
-				{
-				sscanf(&argv[i][6], "%lf", &P.clP4);
-				}
-			else if(argv[i][1] == 'C' && argv[i][2] == 'L' && argv[i][3] == 'P' && argv[i][4] == '5' && argv[i][5] == ':') // generic command line specified param - matched to #5 in param file
-				{
-				sscanf(&argv[i][6], "%lf", &P.clP5);
-				}
-			else if(argv[i][1] == 'C' && argv[i][2] == 'L' && argv[i][3] == 'P' && argv[i][4] == '6' && argv[i][5] == ':') // generic command line specified param - matched to #6 in param file
-				{
-				sscanf(&argv[i][6], "%lf", &P.clP6);
-				}
-			else if (argv[i][1] == 'A' && argv[i][2] == 'P' && argv[i][3] == ':')
-			{
-				GotAP = 1;
-				sscanf(&argv[i][3], "%s", AirTravelFile);
-			}
-			else if (argv[i][1] == 's' && argv[i][2] == ':')
-			{
-				GotScF = 1;
-				sscanf(&argv[i][3], "%s", SchoolFile);
-			}
-			else if (argv[i][1] == 'T' && argv[i][2] == ':')
-			{
-				sscanf(&argv[i][3], "%i", &P.PreControlClusterIdCaseThreshold);
-			}
-			else if (argv[i][1] == 'C' && argv[i][2] == ':')
-			{
-				sscanf(&argv[i][3], "%i", &P.PlaceCloseIndepThresh);
-			}
-			else if (argv[i][1] == 'd' && argv[i][2] == ':')
-			{
-				P.DoAdunitDemog = 1;
-				sscanf(&argv[i][3], "%s", RegDemogFile);
-			}
-			else if (argv[i][1] == 'c' && argv[i][2] == ':')
-			{
-				sscanf(&argv[i][3], "%i", &P.MaxNumThreads);
-			}
-			else if (argv[i][1] == 'M' && argv[i][2] == ':')
-			{
-				P.OutputDensFile = 1;
-				sscanf(&argv[i][3], "%s", OutDensFile);
-			}
-			else if (argv[i][1] == 'I' && argv[i][2] == ':')
-			{
-				sscanf(&argv[i][3], "%s", InterventionFile[P.DoInterventionFile]);
-				P.DoInterventionFile++;
-			}
-			else if (argv[i][1] == 'L' && argv[i][2] == 'S' && argv[i][3] == ':')
-			{
-				sscanf(&argv[i][4], "%s", SnapshotLoadFile);
-				P.DoLoadSnapshot = 1;
-			}
-			else if (argv[i][1] == 'P' && argv[i][2] == 'P' && argv[i][3] == ':')
-			{
-				sscanf(&argv[i][4], "%s", PreParamFile);
-				GotPP = 1;
-			}
-			else if (argv[i][1] == 'S' && argv[i][2] == 'S' && argv[i][3] == ':')
-			{
-				sscanf(&argv[i][4], "%s", buf);
-				fprintf(stderr, "### %s\n", buf);
-				sep = strchr(buf, ',');
-				if (!sep)
-					Perr = 1;
-				else
-				{
-					P.DoSaveSnapshot = 1;
-					*sep = ' ';
-					sscanf(buf, "%lf %s", &(P.SnapshotSaveTime), SnapshotSaveFile);
-				}
-			}
-		}
-		if (((GotS) && (GotL)) || (!GotP) || (!GotO)) Perr = 1;
-	}
-
-	///// END Read in command line arguments
+    ///// END Read in command line arguments
 
 	sprintf(OutFile, "%s", OutFileBase);
 
