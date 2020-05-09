@@ -13,9 +13,12 @@ public:
 
 protected:
     param& P();
+    char* OutFile() const;
+    char* OutFileBase() const;
+
     // variable initialised in CovidSImp.cpp:main
     char ParamFile[1024]{}, DensityFile[1024]{}, NetworkFile[1024]{}, AirTravelFile[1024]{}, SchoolFile[1024]{}, RegDemogFile[1024]{}, InterventionFile[MAXINTFILE][1024]{}, PreParamFile[1024]{}, buf[2048]{}, * sep;
-    int i, GotPP, GotO, GotAP, GotScF, Perr, cl;
+    int i, GotPP, GotAP, GotScF, Perr, cl;
 
 private:
     void CovidSimMainInitialisation();

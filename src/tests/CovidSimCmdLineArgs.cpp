@@ -10,7 +10,6 @@ std::vector<std::string> CovidSimCmdLineArgs::BuildCmdLine() const {
             "/PP:preUK_R0=2.0.txt",
             "/CLP1:100000",
             "/CLP2:0",
-            "/O:NoInt_R0=2.2",
             "/D:wpop_file",
             "/M:wpop_bin",
             "/A:sample_admin.txt",
@@ -21,11 +20,12 @@ std::vector<std::string> CovidSimCmdLineArgs::BuildCmdLine() const {
             args.push_back(std::string("/") + argSwitch + ":" + argField.value());
         }
     };
+    addOptionalArg("AP", airTravelFile);
     addOptionalArg("C", placeCloseIndepThreshold);
     addOptionalArg("L", networkFileToLoad);
-    addOptionalArg("S", networkFileToSave);
-    addOptionalArg("AP", airTravelFile);
+    addOptionalArg("O", outFileBasePath);
     addOptionalArg("P", paramFile);
+    addOptionalArg("S", networkFileToSave);
 
     args.push_back(setupSeeds[0]);
     args.push_back(setupSeeds[1]);

@@ -114,8 +114,8 @@ void
 ParseCmdLineArgs(int argc, const char** argv, char *ParamFile, char *DensityFile, char *NetworkFile,
                  char *AirTravelFile, char *SchoolFile, char *RegDemogFile,
                  char InterventionFile[][1024] , char *PreParamFile, char *buf, char *sep, int i,
-                 int GotO, int &GotPP, int &GotAP, int &GotScF, int &Perr) {
-    int GotL = 0, GotS = 0, GotP = 0;
+                 int &GotPP, int &GotAP, int &GotScF, int &Perr) {
+    int GotL = 0, GotS = 0, GotO = 0, GotP = 0;
     if (argc < 7) Perr = 1;
     else
     {
@@ -274,10 +274,10 @@ ParseCmdLineArgs(int argc, const char** argv, char *ParamFile, char *DensityFile
 int _main(int argc, const char* argv[])
 {
 	char ParamFile[1024]{}, DensityFile[1024]{}, NetworkFile[1024]{}, AirTravelFile[1024]{}, SchoolFile[1024]{}, RegDemogFile[1024]{}, InterventionFile[MAXINTFILE][1024]{}, PreParamFile[1024]{}, buf[2048]{}, * sep;
-	int i, GotPP, GotO, GotAP, GotScF, Perr, cl;
+	int i, GotPP, GotAP, GotScF, Perr, cl;
 
 	///// Flags to ensure various parameters have been read; set to false as default.
-	GotO = GotAP = GotScF = GotPP = 0;
+	GotAP = GotScF = GotPP = 0;
 
 	Perr = 0;
 	fprintf(stderr, "sizeof(int)=%i sizeof(long)=%i sizeof(float)=%i sizeof(double)=%i sizeof(unsigned short int)=%i sizeof(int *)=%i\n", (int)sizeof(int), (int)sizeof(long), (int)sizeof(float), (int)sizeof(double), (int)sizeof(unsigned short int), (int)sizeof(int*));
@@ -287,7 +287,7 @@ int _main(int argc, const char* argv[])
 
     ParseCmdLineArgs(argc, argv, ParamFile, DensityFile, NetworkFile, AirTravelFile, SchoolFile, RegDemogFile,
                      InterventionFile,
-                     PreParamFile, buf, sep, i, GotO, GotPP, GotAP, GotScF, Perr);
+                     PreParamFile, buf, sep, i, GotPP, GotAP, GotScF, Perr);
 
     ///// END Read in command line arguments
 

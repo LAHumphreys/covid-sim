@@ -8,6 +8,7 @@ struct CovidSimCmdLineArgs {
     std::optional<std::string> airTravelFile;
     std::optional<std::string> networkFileToLoad;
     std::optional<std::string> networkFileToSave;
+    std::optional<std::string> outFileBasePath = "results_";
     std::optional<std::string> paramFile = "paramFile.txt";
     std::optional<std::string> placeCloseIndepThreshold;
 
