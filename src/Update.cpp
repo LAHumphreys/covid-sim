@@ -222,9 +222,9 @@ void DoMild(int ai, int tn)
 	if (P.DoSeverity) //// shouldn't need this but best be careful.
 	{
 		person* a = Hosts + ai;
-		if (a->Severity_Current == Severity_Asymptomatic)
+		if (a->Severity_Current == Severity::Asymptomatic)
 		{
-			a->Severity_Current = Severity_Mild;
+			a->Severity_Current = Severity::Mild;
 			StateT[tn].Mild++;
 			StateT[tn].cumMild++;
 			if (P.DoAdUnits)
@@ -240,9 +240,9 @@ void DoILI(int ai, int tn)
 	if (P.DoSeverity) //// shouldn't need this but best be careful.
 	{
 		person* a = Hosts + ai;
-		if (a->Severity_Current == Severity_Asymptomatic)
+		if (a->Severity_Current == Severity::Asymptomatic)
 		{
-			a->Severity_Current = Severity_ILI;
+			a->Severity_Current = Severity::ILI;
 			StateT[tn].ILI++;
 			StateT[tn].cumILI++;
 			if (P.DoAdUnits)
@@ -258,9 +258,9 @@ void DoSARI(int ai, int tn)
 	if (P.DoSeverity) //// shouldn't need this but best be careful.
 	{
 		person* a = Hosts + ai;
-		if (a->Severity_Current == Severity_ILI)
+		if (a->Severity_Current == Severity::ILI)
 		{
-			a->Severity_Current = Severity_SARI;
+			a->Severity_Current = Severity::SARI;
 			StateT[tn].ILI--;
 			StateT[tn].SARI++;
 			StateT[tn].cumSARI++;
@@ -279,9 +279,9 @@ void DoCritical(int ai, int tn)
 	if (P.DoSeverity) //// shouldn't need this but best be careful.
 	{
 		person* a = Hosts + ai;
-		if (a->Severity_Current == Severity_SARI)
+		if (a->Severity_Current == Severity::SARI)
 		{
-			a->Severity_Current = Severity_Critical;
+			a->Severity_Current = Severity::Critical;
 			StateT[tn].SARI--;
 			StateT[tn].Critical++;
 			StateT[tn].cumCritical++;
@@ -303,9 +303,9 @@ void DoRecoveringFromCritical(int ai, int tn)
 	if (P.DoSeverity) //// shouldn't need this but best be careful.
 	{
 		person* a = Hosts + ai;
-		if (a->Severity_Current == Severity_Critical && (!a->to_die)) //// second condition should be unnecessary but leave in for now.
+		if (a->Severity_Current == Severity::Critical && (!a->to_die)) //// second condition should be unnecessary but leave in for now.
 		{
-			a->Severity_Current = Severity_RecoveringFromCritical;
+			a->Severity_Current = Severity::RecoveringFromCritical;
 			StateT[tn].Critical--;
 			StateT[tn].CritRecov++;
 			StateT[tn].cumCritRecov++;
@@ -324,7 +324,7 @@ void DoDeath_FromCriticalorSARIorILI(int ai, int tn)
 	person* a = Hosts + ai;
 	if (P.DoSeverity)
 	{
-		if (a->Severity_Current == Severity_Critical)
+		if (a->Severity_Current == Severity::Critical)
 		{
 			StateT[tn].Critical--;
 			StateT[tn].cumDeath_Critical++;
@@ -334,9 +334,9 @@ void DoDeath_FromCriticalorSARIorILI(int ai, int tn)
 				StateT[tn].cumDeath_Critical_adunit	[Mcells[a->mcell].adunit]++;
 			}
 			//// change current status (so that flags work if function called again for same person). Don't move this outside of this if statement, even though it looks like it can be moved safely. It can't.
-			a->Severity_Current = Severity_Dead;
+			a->Severity_Current = Severity::Dead;
 		}
-		else if (a->Severity_Current == Severity_SARI)
+		else if (a->Severity_Current == Severity::SARI)
 		{
 			StateT[tn].SARI--;
 			StateT[tn].cumDeath_SARI++;
@@ -346,9 +346,9 @@ void DoDeath_FromCriticalorSARIorILI(int ai, int tn)
 				StateT[tn].cumDeath_SARI_adunit	[Mcells[a->mcell].adunit]++;
 			}
 			//// change current status (so that flags work if function called again for same person). Don't move this outside of this if statement, even though it looks like it can be moved safely. It can't.
-			a->Severity_Current = Severity_Dead;
+			a->Severity_Current = Severity::Dead;
 		}
-		else if (a->Severity_Current == Severity_ILI)
+		else if (a->Severity_Current == Severity::ILI)
 		{
 			StateT[tn].ILI--;
 			StateT[tn].cumDeath_ILI++;
@@ -358,7 +358,7 @@ void DoDeath_FromCriticalorSARIorILI(int ai, int tn)
 				StateT[tn].cumDeath_ILI_adunit	[Mcells[a->mcell].adunit]++;
 			}
 			//// change current status (so that flags work if function called again for same person). Don't move this outside of this if statement, even though it looks like it can be moved safely. It can't.
-			a->Severity_Current = Severity_Dead;
+			a->Severity_Current = Severity::Dead;
 		}
 	}
 }
@@ -374,33 +374,33 @@ void DoRecover_FromSeverity(int ai, int tn)
 	if (P.DoSeverity)
 		if (a->inf == InfStat_InfectiousAsymptomaticNotCase || a->inf == InfStat_Case) ///// i.e same condition in DoRecover (make sure you don't recover people twice).
 		{
-			if (a->Severity_Current == Severity_Mild)
+			if (a->Severity_Current == Severity::Mild)
 			{
 				StateT[tn].Mild--;
 				if (P.DoAdUnits) StateT[tn].Mild_adunit[Mcells[a->mcell].adunit]--;
 				//// change current status (so that flags work if function called again for same person). Don't move this outside of this if statement, even though it looks like it can be moved safely. It can't.
-				a->Severity_Current = Severity_Recovered;
+				a->Severity_Current = Severity::Recovered;
 			}
-			else if (a->Severity_Current == Severity_ILI)
+			else if (a->Severity_Current == Severity::ILI)
 			{
 				StateT[tn].ILI--;
 				if (P.DoAdUnits) StateT[tn].ILI_adunit[Mcells[a->mcell].adunit]--;
 				//// change current status (so that flags work if function called again for same person). Don't move this outside of this if statement, even though it looks like it can be moved safely. It can't.
-				a->Severity_Current = Severity_Recovered;
+				a->Severity_Current = Severity::Recovered;
 			}
-			else if (a->Severity_Current == Severity_SARI)
+			else if (a->Severity_Current == Severity::SARI)
 			{
 				StateT[tn].SARI--;
 				if (P.DoAdUnits) StateT[tn].SARI_adunit[Mcells[a->mcell].adunit]--;
 				//// change current status (so that flags work if function called again for same person). Don't move this outside of this if statement, even though it looks like it can be moved safely. It can't.
-				a->Severity_Current = Severity_Recovered;
+				a->Severity_Current = Severity::Recovered;
 			}
-			else if (a->Severity_Current == Severity_RecoveringFromCritical)
+			else if (a->Severity_Current == Severity::RecoveringFromCritical)
 			{
 				StateT[tn].CritRecov--; //// decrement CritRecov, not critical.
 				if (P.DoAdUnits) StateT[tn].CritRecov_adunit[Mcells[a->mcell].adunit]--;
 				//// change current status (so that flags work if function called again for same person). Don't move this outside of this if statement, even though it looks like it can be moved safely. It can't.
-				a->Severity_Current = Severity_Recovered;
+				a->Severity_Current = Severity::Recovered;
 			}
 		}
 }
@@ -445,15 +445,15 @@ void DoIncub(int ai, unsigned short int ts, int tn, int run)
 			a->Severity_Final = ChooseFinalDiseaseSeverity(age, tn);
 
 			/// choose outcome recovery or death
-			if (	((a->Severity_Final == Severity_Critical)	&& (ranf_mt(tn) < P.CFR_Critical_ByAge	[age]))		||
-					((a->Severity_Final == Severity_SARI	)	&& (ranf_mt(tn) < P.CFR_SARI_ByAge		[age]))		||
-					((a->Severity_Final == Severity_ILI		)	&& (ranf_mt(tn) < P.CFR_ILI_ByAge		[age]))		)
+			if (	((a->Severity_Final == Severity::Critical)	&& (ranf_mt(tn) < P.CFR_Critical_ByAge	[age]))		||
+					((a->Severity_Final == Severity::SARI	)	&& (ranf_mt(tn) < P.CFR_SARI_ByAge		[age]))		||
+					((a->Severity_Final == Severity::ILI		)	&& (ranf_mt(tn) < P.CFR_ILI_ByAge		[age]))		)
 				a->to_die = 1;
 
 			//// choose events and event times
-			if (a->Severity_Final == Severity_Mild)
+			if (a->Severity_Final == Severity::Mild)
 				a->recovery_or_death_time = CaseTime + ChooseFromICDF(P.MildToRecovery_icdf, P.Mean_MildToRecovery, tn);
-			else if (a->Severity_Final == Severity_Critical)
+			else if (a->Severity_Final == Severity::Critical)
 			{
 				a->SARI_time		= CaseTime		+ ChooseFromICDF(P.ILIToSARI_icdf		, P.Mean_ILIToSARI		, tn);
 				a->Critical_time	= a->SARI_time	+ ChooseFromICDF(P.SARIToCritical_icdf	, P.Mean_SARIToCritical	, tn);
@@ -465,7 +465,7 @@ void DoIncub(int ai, unsigned short int ts, int tn, int run)
 					a->recovery_or_death_time		= a->RecoveringFromCritical_time	+ ChooseFromICDF(P.CritRecovToRecov_icdf	, P.Mean_CritRecovToRecov	, tn);
 				}
 			}
-			else if (a->Severity_Final == Severity_SARI)
+			else if (a->Severity_Final == Severity::SARI)
 			{
 				a->SARI_time = CaseTime + ChooseFromICDF(P.ILIToSARI_icdf, P.Mean_ILIToSARI, tn);
 				if (a->to_die)
@@ -473,7 +473,7 @@ void DoIncub(int ai, unsigned short int ts, int tn, int run)
 				else
 					a->recovery_or_death_time = a->SARI_time + ChooseFromICDF(P.SARIToRecovery_icdf	, P.Mean_SARIToRecovery	, tn);
 			}
-			else /*i.e. if Severity_Final == Severity_ILI*/
+			else /*i.e. if Severity_Final == Severity::ILI*/
 			{
 				if (a->to_die)
 					a->recovery_or_death_time = CaseTime + ChooseFromICDF(P.ILIToDeath_icdf		, P.Mean_ILIToDeath		, tn);
@@ -848,7 +848,7 @@ void DoCase(int ai, double t, unsigned short int ts, int tn) //// makes an infec
 
 		if (P.DoSeverity)
 		{
-			if (a->Severity_Final == Severity_Mild)
+			if (a->Severity_Final == Severity::Mild)
 				DoMild(ai, tn);
 			else
 				DoILI(ai, tn); //// symptomatic cases either mild or ILI at symptom onset. SARI and Critical cases still onset with ILI.
@@ -1315,10 +1315,10 @@ int ChooseFinalDiseaseSeverity(int AgeGroup, int tn)
 	// assume normalised props
 
 	x = ranf_mt(tn);
-	if (x < P.Prop_ILI_ByAge[AgeGroup]) DiseaseSeverity = Severity_ILI;
-	else if (x < P.Prop_ILI_ByAge[AgeGroup] + P.Prop_SARI_ByAge[AgeGroup]) DiseaseSeverity = Severity_SARI;
-	else if (x < P.Prop_ILI_ByAge[AgeGroup] + P.Prop_SARI_ByAge[AgeGroup] + P.Prop_Critical_ByAge[AgeGroup]) DiseaseSeverity = Severity_Critical;
-	else DiseaseSeverity = Severity_Mild;
+	if (x < P.Prop_ILI_ByAge[AgeGroup]) DiseaseSeverity = Severity::ILI;
+	else if (x < P.Prop_ILI_ByAge[AgeGroup] + P.Prop_SARI_ByAge[AgeGroup]) DiseaseSeverity = Severity::SARI;
+	else if (x < P.Prop_ILI_ByAge[AgeGroup] + P.Prop_SARI_ByAge[AgeGroup] + P.Prop_Critical_ByAge[AgeGroup]) DiseaseSeverity = Severity::Critical;
+	else DiseaseSeverity = Severity::Mild;
 	return DiseaseSeverity;
 }
 
