@@ -12,6 +12,7 @@ class Airports: public ParamReadTest {};
 class NetworkFiles: public ParamReadTest {};
 class OutFileBasePath: public ParamReadTest {};
 class ParamsFile: public ParamReadTest {};
+class PreParamsFile: public ParamReadTest {};
 class PlaceClose: public ParamReadTest {};
 
 TEST_F(OutFileBasePath, Specifed) {
@@ -24,6 +25,20 @@ TEST_F(OutFileBasePath, MandatoryField) {
     args.outFileBasePath.reset();
     InvokeReadParam(args.BuildCmdLine());
     ASSERT_TRUE(Perr);
+}
+
+TEST_F(PreParamsFile, PreParamFileSet) {
+    args.preParamFile = "testPreParams.txt";
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_STREQ(PreParamFile, "testPreParams.txt");
+    ASSERT_TRUE(GotPP);
+}
+TEST_F(PreParamsFile, OptionalField) {
+    args.preParamFile.reset();
+    InvokeReadParam(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_FALSE(GotPP);
 }
 
 TEST_F(ParamsFile, ParamFileSet) {

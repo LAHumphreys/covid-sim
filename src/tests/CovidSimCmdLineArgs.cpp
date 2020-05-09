@@ -7,7 +7,6 @@
 std::vector<std::string> CovidSimCmdLineArgs::BuildCmdLine() const {
     std::vector<std::string> args ={
             "CovidSim",
-            "/PP:preUK_R0=2.0.txt",
             "/CLP1:100000",
             "/CLP2:0",
             "/D:wpop_file",
@@ -25,6 +24,7 @@ std::vector<std::string> CovidSimCmdLineArgs::BuildCmdLine() const {
     addOptionalArg("L", networkFileToLoad);
     addOptionalArg("O", outFileBasePath);
     addOptionalArg("P", paramFile);
+    addOptionalArg("PP", preParamFile);
     addOptionalArg("S", networkFileToSave);
 
     args.push_back(setupSeeds[0]);

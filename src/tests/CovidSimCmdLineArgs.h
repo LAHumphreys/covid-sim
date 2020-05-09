@@ -10,6 +10,7 @@ struct CovidSimCmdLineArgs {
     std::optional<std::string> networkFileToSave;
     std::optional<std::string> outFileBasePath = "results_";
     std::optional<std::string> paramFile = "paramFile.txt";
+    std::optional<std::string> preParamFile;
     std::optional<std::string> placeCloseIndepThreshold;
 
     std::string runSeeds[2] = {"17389101", "4797132"};
