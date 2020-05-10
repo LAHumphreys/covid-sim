@@ -6,10 +6,12 @@
 #define COVIDTEST_PREPARAMCONFIGBUILDER_H
 
 #include <memory>
+#include <optional>
 #include "ConfigFile.h"
 
-class PreParamConfigBuilder {
-public:
+struct PreParamConfigBuilder {
+    std::optional<std::string> updateTimestep = "0.25";
+
     std::unique_ptr<ConfigFile> BuildConfig (const std::string& fname = "preParams.dat");
 };
 

@@ -57,9 +57,6 @@ namespace  {
 [Include administrative units within countries]
 1
 
-[Update timestep]
-0.25
-
 [Equilibriation time]
 0
 
@@ -472,5 +469,15 @@ Also comparable with 1957 pandemic attack rates from Chin.)
 }
 
 std::unique_ptr<ConfigFile> PreParamConfigBuilder::BuildConfig(const std::string &fname) {
-    return std::make_unique<ConfigFile>(fname, defaultContent);
+    std::stringstream buf;
+    buf << defaultContent << std::endl;
+    const auto addItem = [&] (const std::string& name, const std::optional<std::string>& val) {
+        if (val.has_value()) {
+            buf << std::endl;
+            buf << "[" << name << "]" << std::endl;
+            buf << val.value() << std::endl;
+        }
+    };
+    addItem("Update timestep", updateTimestep);
+    return std::make_unique<ConfigFile>(fname, buf.str());
 }

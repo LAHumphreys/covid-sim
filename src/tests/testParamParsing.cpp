@@ -31,6 +31,18 @@ protected:
     }
 };
 
+class TimeStep: public ParamParsingTest{};
+
+TEST_F(TimeStep, ReadSteps) {
+    preParams.updateTimestep = "0.25";
+    SetupAndParseParams();
+    ASSERT_EQ(P().TimeStep, 0.25);
+}
+TEST_F(TimeStep, MandatoryUpdateTimestep) {
+    preParams.updateTimestep.reset();
+    EXPECT_CRIT_ERROR(SetupAndParseParams(), "Unable to find .*Update timestep");
+}
+
 TEST_F(ParamParsingTest, DefaultValues) {
     SetupAndParseParams();
 }

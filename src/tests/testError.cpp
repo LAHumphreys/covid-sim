@@ -12,7 +12,7 @@
 #include <cstdarg>
 #include <sstream>
 
-class CriticalError: std::exception {
+class CriticalError: public std::exception {
 public:
     CriticalError(std::string msg): msg(std::move(msg)) {}
     const char* what() const noexcept  override { return msg.c_str();}

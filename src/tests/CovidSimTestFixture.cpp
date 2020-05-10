@@ -1,5 +1,6 @@
 #include "CovidSimTestFixture.h"
 #include "CovidSimExternInterface.h"
+#include <regex>
 
 
 void CovidSimTestFixture::CovidSimMainInitialisation() {
@@ -64,5 +65,23 @@ void CovidSimTestFixture::InvokeSetupThreads() {
 
 void CovidSimTestFixture::InvokeReadParams() {
     ReadParams(ParamFile, PreParamFile);
+}
+
+void CovidSimTestFixture::ExpectCriticalError(
+        const std::string& codeText,
+        const std::function<void()> &code,
+        const std::string& containsRegex)
+{
+    try {
+        code();
+        FAIL() << "Expected an exception to to be thrown when parsing: '" << codeText << "'";
+    } catch (const std::exception& e) {
+        const std::regex msgRegex(containsRegex);
+        EXPECT_TRUE(std::regex_search(e.what(), msgRegex))
+            << ">> Exception message:" << std::endl
+            << e.what()
+            << ">> did not contain expected message:" << std::endl
+            << containsRegex;
+    }
 }
 
