@@ -20,6 +20,8 @@ struct CovidSimCmdLineArgs {
     std::optional<std::string> preParamFile;
     std::optional<std::string> placeCloseIndepThreshold;
     std::optional<std::string> r0;
+    std::optional<std::string> kernelOffsetScale;
+    std::optional<std::string> kernelPowerScale;
 
     std::string runSeeds[2] = {"17389101", "4797132"};
     std::string setupSeeds[2] = {"98798150", "729101"};

@@ -44,6 +44,191 @@ namespace {
     class Cells: public ParamParsingTest {};
     class Households: public ParamParsingTest {};
     class Output: public ParamParsingTest {};
+    class Kernel: public ParamParsingTest {};
+}
+
+TEST_F(Kernel, Specified) {
+    adUnit.kernelResolution = "2000000";
+    adUnit.kernelHigherResolutionFactor  = "40";
+    adUnit.kernelType = "2";
+    adUnit.kernelScale = "4000";
+    adUnit.kernelParam3 = "3";
+    adUnit.kernelParam4 = "4";
+    adUnit.kernelShape = "3";
+    adUnit.kernelScaleParamForPlaces = "3000 3500 4000 4500";
+    adUnit.kernelShapeParamForPlaces = "2 3 4 5";
+    adUnit.kernelParam3ForPlaces = "1 2 3 4";
+    adUnit.kernelParam4ForPlaces = "5 6 7 8";
+    SetupAndParseParams();
+    ASSERT_EQ(P().NKR, 2e6);
+    ASSERT_EQ(P().NK_HR, 40);
+    ASSERT_EQ(P().MoveKernelType, 2);
+    ASSERT_EQ(P().MoveKernelShape, 3);
+    ASSERT_EQ(P().MoveKernelScale, 4000);
+    ASSERT_EQ(P().MoveKernelP3, 3);
+    ASSERT_EQ(P().MoveKernelP4, 4);
+
+    ASSERT_EQ(P().PlaceTypeKernelScale[0], 3000);
+    ASSERT_EQ(P().PlaceTypeKernelScale[1], 3500);
+    ASSERT_EQ(P().PlaceTypeKernelScale[2], 4000);
+    ASSERT_EQ(P().PlaceTypeKernelScale[3], 4500);
+
+    ASSERT_EQ(P().PlaceTypeKernelShape[0], 2);
+    ASSERT_EQ(P().PlaceTypeKernelShape[1], 3);
+    ASSERT_EQ(P().PlaceTypeKernelShape[2], 4);
+    ASSERT_EQ(P().PlaceTypeKernelShape[3], 5);
+
+    ASSERT_EQ(P().PlaceTypeKernelP3[0], 1);
+    ASSERT_EQ(P().PlaceTypeKernelP3[1], 2);
+    ASSERT_EQ(P().PlaceTypeKernelP3[2], 3);
+    ASSERT_EQ(P().PlaceTypeKernelP3[3], 4);
+
+    ASSERT_EQ(P().PlaceTypeKernelP4[0], 5);
+    ASSERT_EQ(P().PlaceTypeKernelP4[1], 6);
+    ASSERT_EQ(P().PlaceTypeKernelP4[2], 7);
+    ASSERT_EQ(P().PlaceTypeKernelP4[3], 8);
+}
+TEST_F(Kernel, CmdLineScales) {
+    args.kernelOffsetScale = "1.5";
+    args.kernelPowerScale = "2.5";
+
+    adUnit.kernelResolution = "2000000";
+    adUnit.kernelHigherResolutionFactor  = "40";
+    adUnit.kernelType = "3";
+    adUnit.kernelScale = "4000";
+    adUnit.kernelShape = "3";
+    adUnit.kernelParam3 = "3";
+    adUnit.kernelParam4 = "4";
+    adUnit.kernelScaleParamForPlaces.reset();
+    adUnit.kernelShapeParamForPlaces.reset();
+    adUnit.kernelParam3ForPlaces.reset();
+    adUnit.kernelParam4ForPlaces.reset();
+    SetupAndParseParams();
+    ASSERT_EQ(P().NKR, 2e6);
+    ASSERT_EQ(P().NK_HR, 40);
+    ASSERT_EQ(P().MoveKernelType, 3);
+    ASSERT_EQ(P().MoveKernelScale, 4000 * 1.5);
+    ASSERT_EQ(P().MoveKernelP3, 3);
+    ASSERT_EQ(P().MoveKernelP4, 4);
+    ASSERT_EQ(P().MoveKernelShape, 3 * 2.5);
+
+    ASSERT_EQ(P().PlaceTypeKernelScale[0], 4000 *1.5);
+    ASSERT_EQ(P().PlaceTypeKernelScale[1], 4000 *1.5);
+    ASSERT_EQ(P().PlaceTypeKernelScale[2], 4000 *1.5);
+    ASSERT_EQ(P().PlaceTypeKernelScale[3], 4000 *1.5);
+
+    ASSERT_EQ(P().PlaceTypeKernelShape[0], 3 * 2.5);
+    ASSERT_EQ(P().PlaceTypeKernelShape[1], 3 * 2.5);
+    ASSERT_EQ(P().PlaceTypeKernelShape[2], 3 * 2.5);
+    ASSERT_EQ(P().PlaceTypeKernelShape[3], 3 * 2.5);
+}
+TEST_F(Kernel, CmdLineScalesNoScaleExplicitPlaceConfig) {
+    args.kernelOffsetScale = "1.5";
+    args.kernelPowerScale = "2.5";
+
+    adUnit.kernelResolution = "2000000";
+    adUnit.kernelHigherResolutionFactor  = "40";
+    adUnit.kernelType = "3";
+    adUnit.kernelScale = "4000";
+    adUnit.kernelShape = "3";
+    adUnit.kernelParam3 = "3";
+    adUnit.kernelParam4 = "4";
+    adUnit.kernelScaleParamForPlaces = "4000 4000 4000 4000";
+    adUnit.kernelShapeParamForPlaces = "3 3 3 3";
+    adUnit.kernelTypeForPlaces = "1 2 3 4";
+    SetupAndParseParams();
+    ASSERT_EQ(P().NKR, 2e6);
+    ASSERT_EQ(P().NK_HR, 40);
+    ASSERT_EQ(P().MoveKernelType, 3);
+    ASSERT_EQ(P().MoveKernelScale, 4000 * 1.5);
+    ASSERT_EQ(P().MoveKernelP3, 3);
+    ASSERT_EQ(P().MoveKernelP4, 4);
+    ASSERT_EQ(P().MoveKernelShape, 3 * 2.5);
+
+    ASSERT_EQ(P().PlaceTypeKernelScale[0], 4000);
+    ASSERT_EQ(P().PlaceTypeKernelScale[1], 4000);
+    ASSERT_EQ(P().PlaceTypeKernelScale[2], 4000);
+    ASSERT_EQ(P().PlaceTypeKernelScale[3], 4000);
+
+    ASSERT_EQ(P().PlaceTypeKernelShape[0], 3);
+    ASSERT_EQ(P().PlaceTypeKernelShape[1], 3);
+    ASSERT_EQ(P().PlaceTypeKernelShape[2], 3);
+    ASSERT_EQ(P().PlaceTypeKernelShape[3], 3);
+
+    ASSERT_EQ(P().PlaceTypeKernelType[0], 1);
+    ASSERT_EQ(P().PlaceTypeKernelType[1], 2);
+    ASSERT_EQ(P().PlaceTypeKernelType[2], 3);
+    ASSERT_EQ(P().PlaceTypeKernelType[3], 4);
+}
+TEST_F(Kernel, Defaulted) {
+    adUnit.kernelResolution.reset();
+    adUnit.kernelHigherResolutionFactor.reset();
+    adUnit.kernelShape.reset();
+    adUnit.kernelParam3.reset();
+    adUnit.kernelParam4.reset();
+    adUnit.kernelScaleParamForPlaces.reset();
+    adUnit.kernelShapeParamForPlaces.reset();
+    adUnit.kernelTypeForPlaces.reset();
+
+    adUnit.kernelScale = "3500";
+    adUnit.kernelType = "3";
+
+    SetupAndParseParams();
+
+    ASSERT_EQ(P().MoveKernelScale, 3500);
+
+    ASSERT_EQ(P().NKR, 4e6);
+    ASSERT_EQ(P().NK_HR, (4e6 / 1600));
+    ASSERT_EQ(P().MoveKernelShape, 1.0);
+    ASSERT_EQ(P().MoveKernelP3, 0);
+    ASSERT_EQ(P().MoveKernelP4, 0);
+
+    ASSERT_EQ(P().PlaceTypeKernelScale[0], 3500);
+    ASSERT_EQ(P().PlaceTypeKernelScale[1], 3500);
+    ASSERT_EQ(P().PlaceTypeKernelScale[2], 3500);
+    ASSERT_EQ(P().PlaceTypeKernelScale[3], 3500);
+
+    ASSERT_EQ(P().PlaceTypeKernelShape[0], 1.0);
+    ASSERT_EQ(P().PlaceTypeKernelShape[1], 1.0);
+    ASSERT_EQ(P().PlaceTypeKernelShape[2], 1.0);
+    ASSERT_EQ(P().PlaceTypeKernelShape[3], 1.0);
+
+    ASSERT_EQ(P().PlaceTypeKernelP3[0], 0);
+    ASSERT_EQ(P().PlaceTypeKernelP3[1], 0);
+    ASSERT_EQ(P().PlaceTypeKernelP3[2], 0);
+    ASSERT_EQ(P().PlaceTypeKernelP3[3], 0);
+
+    ASSERT_EQ(P().PlaceTypeKernelP4[0], 0);
+    ASSERT_EQ(P().PlaceTypeKernelP4[1], 0);
+    ASSERT_EQ(P().PlaceTypeKernelP4[2], 0);
+    ASSERT_EQ(P().PlaceTypeKernelP4[3], 0);
+
+    ASSERT_EQ(P().PlaceTypeKernelType[0], 3);
+    ASSERT_EQ(P().PlaceTypeKernelType[1], 3);
+    ASSERT_EQ(P().PlaceTypeKernelType[2], 3);
+    ASSERT_EQ(P().PlaceTypeKernelType[3], 3);
+}
+TEST_F(Kernel, MandatoryKernelType) {
+    adUnit.kernelType.reset();
+    EXPECT_CRIT_ERROR(SetupAndParseParams(), "Unable to find .*`Kernel type");
+}
+TEST_F(Kernel, MandatoryKernelScale){
+    adUnit.kernelScale.reset();
+    EXPECT_CRIT_ERROR(SetupAndParseParams(), "Unable to find .*`Kernel scale");
+}
+TEST_F(Kernel, MinKernelRes) {
+    adUnit.kernelResolution = "1999999";
+    EXPECT_CRIT_ERROR(SetupAndParseParams(), "[Kernel resolution] .* at least 2000000")
+}
+TEST_F(Kernel, KernalHigherFactorResMin) {
+    adUnit.kernelHigherResolutionFactor = "0";
+    adUnit.kernelResolution = "2000000";
+    EXPECT_CRIT_ERROR(SetupAndParseParams(), R"REGEX(\[Kernel higher resolution factor\] needs to be in range)REGEX");
+}
+TEST_F(Kernel, KernalHigherFactorResMax) {
+    adUnit.kernelHigherResolutionFactor = "2000000";
+    adUnit.kernelResolution = "2000000";
+    EXPECT_CRIT_ERROR(SetupAndParseParams(), R"REGEX(\[Kernel higher resolution factor\] needs to be in range)REGEX");
 }
 
 TEST_F(Output, Specified) {

@@ -114,13 +114,6 @@ East_Midlands	East_of_England	London	North_East	North_West	South_East	South_West
 [Maximum age for age group 3 in place types]
 65	65	65	65
 
-[Kernel shape params for place types]
-3 3 3 3
-
-
-[Kernel scale params for place types]
-4000  4000  4000  4000
-
 [Mean size of place types]
 230 1010  3300  14.28
 
@@ -140,21 +133,6 @@ East_Midlands	East_of_England	London	North_East	North_West	South_East	South_West
 
 [Maximum of place size distribution]
 0 0 0 5927
-
-[Kernel type]
-2
-
-[Kernel scale]
-4000
-
-[Kernel Shape]
-3
-
-[Kernel resolution]
-2000000
-
-[Kernel higher resolution factor]
-400
 
 ===================================
 [Include holidays]
@@ -191,6 +169,18 @@ std::unique_ptr<ConfigFile> AdunitConfigBuilder::BuildCfgFile(
     };
     addItem("Population size", populationSize);
     addItem("Include households", doHouseholds);
+    addItem("Kernel type", kernelType);
+    addItem("Kernel scale", kernelScale);
+    addItem("Kernel Shape", kernelShape);
+    addItem("Kernel resolution", kernelResolution);
+    addItem("Kernel higher resolution factor", kernelHigherResolutionFactor);
+    addItem("Kernel 3rd param", kernelParam3);
+    addItem("Kernel 4th param", kernelParam4);
+    addItem("Kernel shape params for place types", kernelShapeParamForPlaces);
+    addItem("Kernel scale params for place types", kernelScaleParamForPlaces);
+    addItem("Kernel type for place types", kernelTypeForPlaces);
+    addItem("Kernel 3rd param for place types", kernelParam3ForPlaces);
+    addItem("Kernel 4th param for place types", kernelParam4ForPlaces);
 
     return std::make_unique<ConfigFile>(fname, buf.str());
 }

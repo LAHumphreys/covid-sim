@@ -26,6 +26,8 @@ std::vector<std::string> CovidSimCmdLineArgs::BuildCmdLine() const {
     addOptionalArg("PP", preParamFile);
     addOptionalArg("R", r0);
     addOptionalArg("S", networkFileToSave);
+    addOptionalArg("KO", kernelOffsetScale);
+    addOptionalArg("KP", kernelPowerScale);
 
     std::stringstream paramName;
     for (size_t i = 0; i < NUM_CMD_LINE_PARAMS; ++i) {

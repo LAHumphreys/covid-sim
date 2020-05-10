@@ -7,18 +7,37 @@ protected:
     CovidSimCmdLineArgs args;
 };
 
-class AdminFile: public CommandLineParsingTest {};
-class Airports: public CommandLineParsingTest {};
-class CommandLineParams: public CommandLineParsingTest {};
-class DensityFiles: public CommandLineParsingTest {};
-class NetworkFiles: public CommandLineParsingTest {};
-class OutFileBasePath: public CommandLineParsingTest {};
-class ParamsFile: public CommandLineParsingTest {};
-class PlaceClose: public CommandLineParsingTest {};
-class PreParamsFile: public CommandLineParsingTest {};
-class R0Scale: public CommandLineParsingTest {};
-class MaxThreads: public CommandLineParsingTest {};
+namespace {
+    class AdminFile: public CommandLineParsingTest {};
+    class Airports: public CommandLineParsingTest {};
+    class CommandLineParams: public CommandLineParsingTest {};
+    class DensityFiles: public CommandLineParsingTest {};
+    class Kernel: public CommandLineParsingTest {};
+    class MaxThreads: public CommandLineParsingTest {};
+    class NetworkFiles: public CommandLineParsingTest {};
+    class OutFileBasePath: public CommandLineParsingTest {};
+    class ParamsFile: public CommandLineParsingTest {};
+    class PlaceClose: public CommandLineParsingTest {};
+    class PreParamsFile: public CommandLineParsingTest {};
+    class R0Scale: public CommandLineParsingTest {};
+}
 
+TEST_F(Kernel, Optional) {
+    args.kernelOffsetScale.reset();
+    args.kernelPowerScale.reset();
+    InvokeParseCmdLine(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(P().KernelOffsetScale, 1);
+    ASSERT_EQ(P().KernelPowerScale, 1);
+}
+TEST_F(Kernel, Specified) {
+    args.kernelOffsetScale = "1.5";
+    args.kernelPowerScale = "2.5";
+    InvokeParseCmdLine(args.BuildCmdLine());
+    ASSERT_FALSE(Perr);
+    ASSERT_EQ(P().KernelOffsetScale, 1.5);
+    ASSERT_EQ(P().KernelPowerScale, 2.5);
+}
 TEST_F(MaxThreads, Optional) {
     args.maxThreads.reset();
     InvokeParseCmdLine(args.BuildCmdLine());
