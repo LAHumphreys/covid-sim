@@ -2,22 +2,22 @@
 #include "CovidSimTestFixture.h"
 #include "CovidSimCmdLineArgs.h"
 
-class ParamReadTest: public CovidSimTestFixture {
+class CommandLineParsingTest: public CovidSimTestFixture {
 protected:
     CovidSimCmdLineArgs args;
 };
 
-class AdminFile: public ParamReadTest {};
-class Airports: public ParamReadTest {};
-class CommandLineParams: public ParamReadTest {};
-class DensityFiles: public ParamReadTest {};
-class NetworkFiles: public ParamReadTest {};
-class OutFileBasePath: public ParamReadTest {};
-class ParamsFile: public ParamReadTest {};
-class PlaceClose: public ParamReadTest {};
-class PreParamsFile: public ParamReadTest {};
-class R0Scale: public ParamReadTest {};
-class MaxThreads: public ParamReadTest {};
+class AdminFile: public CommandLineParsingTest {};
+class Airports: public CommandLineParsingTest {};
+class CommandLineParams: public CommandLineParsingTest {};
+class DensityFiles: public CommandLineParsingTest {};
+class NetworkFiles: public CommandLineParsingTest {};
+class OutFileBasePath: public CommandLineParsingTest {};
+class ParamsFile: public CommandLineParsingTest {};
+class PlaceClose: public CommandLineParsingTest {};
+class PreParamsFile: public CommandLineParsingTest {};
+class R0Scale: public CommandLineParsingTest {};
+class MaxThreads: public CommandLineParsingTest {};
 
 TEST_F(MaxThreads, Optional) {
     args.maxThreads.reset();
@@ -208,11 +208,11 @@ TEST_F(R0Scale, Specified) {
     ASSERT_FLOAT_EQ(P().R0scale, 2.3);
 }
 
-TEST_F(ParamReadTest, DefaultArgs) {
+TEST_F(CommandLineParsingTest, DefaultArgs) {
     InvokeReadParam(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
 }
-TEST_F(ParamReadTest, SetupSeeds) {
+TEST_F(CommandLineParsingTest, SetupSeeds) {
     args.setupSeeds[0] = "789";
     args.setupSeeds[1] = "456";
 
@@ -222,7 +222,7 @@ TEST_F(ParamReadTest, SetupSeeds) {
     ASSERT_EQ(P().setupSeed1, 789);
     ASSERT_EQ(P().setupSeed2, 456);
 }
-TEST_F(ParamReadTest, RunTimeSeeds) {
+TEST_F(CommandLineParsingTest, RunTimeSeeds) {
     args.runSeeds[0] = "123";
     args.runSeeds[1] = "456";
 
@@ -232,4 +232,3 @@ TEST_F(ParamReadTest, RunTimeSeeds) {
     ASSERT_EQ(P().runSeed1, 123);
     ASSERT_EQ(P().runSeed2, 456);
 }
-// TODO: Currently the commandline handler has no handling for bas seed arguments

@@ -51,8 +51,8 @@ add_library(CovidSimTest
 		CovidSimTestFixture.h CovidSimCmdLineArgs.cpp CovidSimCmdLineArgs.h)
 target_link_libraries(CovidSimTest PUBLIC CovidSim GTest::GTest)
 
-add_executable(paramRead paramReadTests.cpp)
-target_link_libraries(paramRead CovidSim CovidSimTest GTest::GTest GTest::Main)
+add_executable(testCommandLineParsing testCommandLineParsing.cpp)
+target_link_libraries(testCommandLineParsing CovidSim CovidSimTest GTest::GTest GTest::Main)
 
 enable_testing()
-add_test(paramRead paramRead)
+add_test(testCommandLineParsing testCommandLineParsing)
