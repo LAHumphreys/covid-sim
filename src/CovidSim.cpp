@@ -273,6 +273,8 @@ ParseCmdLineArgs(int argc, const char** argv, char *ParamFile, char *DensityFile
         {
             sprintf(PreParamFile, ".." DIRECTORY_SEPARATOR "Pre_%s", ParamFile);
         }
+
+        sprintf(OutFile, "%s", OutFileBase);
     }
 }
 
@@ -319,7 +321,6 @@ int _main(int argc, const char* argv[])
 
     ///// END Read in command line arguments
 
-	sprintf(OutFile, "%s", OutFileBase);
 
 	fprintf(stderr, "Param=%s\nOut=%s\nDens=%s\n", ParamFile, OutFile, DensityFile);
 	if (Perr) ERR_CRITICAL_FMT("Syntax:\n%s /P:ParamFile /O:OutputFile [/AP:AirTravelFile] [/s:SchoolFile] [/D:DensityFile] [/L:NetworkFileToLoad | /S:NetworkFileToSave] [/R:R0scaling] SetupSeed1 SetupSeed2 RunSeed1 RunSeed2\n", argv[0]);

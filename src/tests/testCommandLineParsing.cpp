@@ -113,6 +113,7 @@ TEST_F(OutFileBasePath, Specifed) {
     InvokeReadParam(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_STREQ(OutFileBase(), "results_");
+    ASSERT_STREQ(OutFile(), "results_");
 }
 TEST_F(OutFileBasePath, MandatoryField) {
     args.outFileBasePath.reset();
