@@ -125,13 +125,13 @@ TEST_F(PreParamsFile, PreParamFileSet) {
     InvokeReadParam(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_STREQ(PreParamFile, "testPreParams.txt");
-    ASSERT_TRUE(GotPP);
 }
 TEST_F(PreParamsFile, OptionalField) {
+    args.paramFile = "params.txt";
     args.preParamFile.reset();
     InvokeReadParam(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
-    ASSERT_FALSE(GotPP);
+    ASSERT_STREQ(PreParamFile, "../Pre_params.txt");
 }
 
 TEST_F(ParamsFile, ParamFileSet) {
