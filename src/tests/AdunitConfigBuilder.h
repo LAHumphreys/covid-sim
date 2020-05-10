@@ -11,7 +11,6 @@
 
 struct AdunitConfigBuilder {
     std::optional<std::string> populationSize = "66777534";
-    std::optional<std::string> doHouseholds;
 
     std::optional<std::string> kernelType = "2";
     std::optional<std::string> kernelScale = "4000";
@@ -25,6 +24,10 @@ struct AdunitConfigBuilder {
     std::optional<std::string> kernelTypeForPlaces;
     std::optional<std::string> kernelParam3ForPlaces;
     std::optional<std::string> kernelParam4ForPlaces;
+
+    std::optional<std::string> doHouseholds;
+    std::optional<std::string> householdSizeDist = "0.305305	0.342342	0.159159	0.136136	0.040040	0.011243	0.003677	0.001256	0.000453	0.000388";
+    std::optional<std::string> correctHouseAgeDistToExactGeography = "1";
 
     std::unique_ptr<ConfigFile> BuildCfgFile(const std::string& fname = "admin.txt") const;
 };

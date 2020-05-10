@@ -10,6 +10,8 @@
 #include "ConfigFile.h"
 
 struct PreParamConfigBuilder {
+    std::unique_ptr<ConfigFile> BuildConfig (const std::string& fname = "preParams.dat");
+
     std::optional<std::string> updateTimestep = "0.25";
     std::optional<std::string> samplingTimestep = "1";
     std::optional<std::string> samplingTotalTime = "720";
@@ -22,7 +24,6 @@ struct PreParamConfigBuilder {
 
     std::optional<std::string> numMicroCellsPerSpatialCell = "9";
 
-    std::unique_ptr<ConfigFile> BuildConfig (const std::string& fname = "preParams.dat");
 
     std::optional<std::string> outputAge;
     std::optional<std::string> outputSeverityAdminUnit;
@@ -34,6 +35,9 @@ struct PreParamConfigBuilder {
     std::optional<std::string> outputInfType;
     std::optional<std::string> outputNonSeverity;
     std::optional<std::string> outputNonSummaryResults;
+
+    std::optional<std::string> householdAttackRate = "0.1";
+    std::optional<std::string> householdTransPowerDenom = "0.8"; // see Cauchemez 2004. Deals with impact of increasing size of households on transmitablility
 };
 
 

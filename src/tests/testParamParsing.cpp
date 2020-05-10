@@ -4,6 +4,7 @@
 #include "PreParamConfigBuilder.h"
 #include "AdunitConfigBuilder.h"
 #include "ParamsConfigBuilder.h"
+#include <cmath>
 
 class ParamParsingTest: public CovidSimTestFixture {
 protected:
@@ -279,14 +280,62 @@ TEST_F(Output, Defaulted) {
 }
 
 TEST_F(Households, Specified) {
+    adUnit.doHouseholds = "1";
+    adUnit.householdSizeDist = "0.1";
+    adUnit.correctHouseAgeDistToExactGeography = "1";
+    preParams.householdAttackRate = "0.2";
+    preParams.householdTransPowerDenom = "0.8";
+    for (size_t i = 1; i < MAX_HOUSEHOLD_SIZE; ++i ) {
+        adUnit.householdSizeDist.value() += "\t0.1";
+    }
+
+    SetupAndParseParams();
+
+    ASSERT_EQ(P().DoHouseholds, 1);
+    ASSERT_EQ(P().HouseholdTrans, 0.2);
+    ASSERT_EQ(P().HouseholdTransPow, 0.8);
+    ASSERT_TRUE(adUnit.correctHouseAgeDistToExactGeography);
+    double cummulativeDist = 0.0;
+    for (size_t i = 0; i < MAX_HOUSEHOLD_SIZE; ++i ) {
+        const size_t householdSize = i+1;
+        cummulativeDist += 0.1;
+        // stored distrib is cummlative
+        ASSERT_FLOAT_EQ(P().HouseholdSizeDistrib[0][i], cummulativeDist) << "Failed on item: " << i;
+        ASSERT_FLOAT_EQ(P().HouseholdDenomLookup[i], 1.0 / std::pow((double)householdSize, 0.8));
+    }
+}
+TEST_F(Households, Disabled) {
     adUnit.doHouseholds = "0";
     SetupAndParseParams();
     ASSERT_EQ(P().DoHouseholds, 0);
+    ASSERT_EQ(P().HouseholdTrans, 0.0);
+    ASSERT_EQ(P().HouseholdTransPow, 1.0);
+    ASSERT_EQ(P().HouseholdSizeDistrib[0][0], 1.0);
+    for (size_t i = 1; i < MAX_HOUSEHOLD_SIZE; ++i ) {
+        ASSERT_EQ(P().HouseholdSizeDistrib[i][0], 0.0);
+    }
 }
-TEST_F(Households, Defaulted) {
+TEST_F(Households, MandatoryHouseAttackRates) {
+    adUnit.doHouseholds = "1";
+    preParams.householdAttackRate.reset();
+    EXPECT_CRIT_ERROR(SetupAndParseParams(), "Unable to find .*`Household attack rate'");
+}
+TEST_F(Households, MandatoryHouseTransPower) {
+    adUnit.doHouseholds = "1";
+    preParams.householdTransPowerDenom.reset();
+    EXPECT_CRIT_ERROR(SetupAndParseParams(), "Unable to find .*`Household transmission denominator power'");
+}
+TEST_F(Households, MandatorySizeDist) {
+    adUnit.doHouseholds = "1";
+    adUnit.householdSizeDist.reset();
+    EXPECT_CRIT_ERROR(SetupAndParseParams(), "Unable to find .*`Household size distribution'");
+}
+TEST_F(Households, DefaultEnabled) {
     adUnit.doHouseholds.reset();
+    adUnit.correctHouseAgeDistToExactGeography.reset();
     SetupAndParseParams();
     ASSERT_EQ(P().DoHouseholds, 1);
+    ASSERT_EQ(P().DoCorrectAgeDist, 0);
 }
 TEST_F(Cells, NumMicroCellsMandatory) {
     preParams.numMicroCellsPerSpatialCell.reset();

@@ -65,14 +65,6 @@ East_Midlands	East_of_England	London	North_East	North_West	South_East	South_West
 0.057810002	0.060683584	0.05827917	0.054298865	0.060021798	0.066052894	0.069334292	0.067586774	0.06346124	0.063284341	0.068269448	0.066860984	0.057523138	0.04981529	0.049914383	0.035974234	0.050829564
 [ONS proj for 2020]
 
-
-[Household size distribution]
-0.305305	0.342342	0.159159	0.136136	0.040040	0.011243	0.003677	0.001256	0.000453	0.000388
-(ONS 2020 with IPUMS and national statistics)
-
-[Correct age distribution after household allocation to exactly match specified demography]
-1
-
 [Include places]
 1
 
@@ -181,6 +173,8 @@ std::unique_ptr<ConfigFile> AdunitConfigBuilder::BuildCfgFile(
     addItem("Kernel type for place types", kernelTypeForPlaces);
     addItem("Kernel 3rd param for place types", kernelParam3ForPlaces);
     addItem("Kernel 4th param for place types", kernelParam4ForPlaces);
+    addItem("Household size distribution", householdSizeDist);
+    addItem("Correct age distribution after household allocation to exactly match specified demography", correctHouseAgeDistToExactGeography);
 
     return std::make_unique<ConfigFile>(fname, buf.str());
 }

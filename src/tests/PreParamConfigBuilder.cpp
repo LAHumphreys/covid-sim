@@ -43,14 +43,6 @@ namespace  {
 0.6	0.7	0.75	1	1	1	1	1	1	1	1	1	1	1	1	0.75	0.5
 (POLYMOD, averaging 20-70)
 
-[Household attack rate]
-0.1
-(Adjusted to be the same as Cauchemez 2004 for R0=1.3.)
-
-[Household transmission denominator power]
-0.8
-(Cauchemez 2004)
-
 [Relative transmission rates for place types]
 0.14	0.14	0.1	0.07
 (School=2 x workplace. This gives Longini AJE 1988 age-specific infection attack rates for R0=1.3.
@@ -448,6 +440,9 @@ std::unique_ptr<ConfigFile> PreParamConfigBuilder::BuildConfig(const std::string
     addItem("OutputInfType", outputInfType);
     addItem("OutputNonSeverity", outputNonSeverity);
     addItem("OutputNonSummaryResults", outputNonSummaryResults);
+    addItem("Household attack rate", householdAttackRate);
+    addItem("Household transmission denominator power", householdTransPowerDenom);
 
     return std::make_unique<ConfigFile>(fname, buf.str());
 }
+
