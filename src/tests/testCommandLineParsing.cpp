@@ -21,26 +21,26 @@ class MaxThreads: public CommandLineParsingTest {};
 
 TEST_F(MaxThreads, Optional) {
     args.maxThreads.reset();
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().MaxNumThreads, 0);
 }
 TEST_F(MaxThreads, Specified) {
     args.maxThreads = "2";
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().MaxNumThreads, 2);
 }
 
 TEST_F(AdminFile, Specified) {
     args.adminFile = "adminFile.txt";
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_STREQ(AdunitFile(), "adminFile.txt");
 }
 TEST_F(AdminFile, Optional) {
     args.adminFile.reset();
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(AdunitFile()[0], 0);
 }
@@ -52,7 +52,7 @@ TEST_F(CommandLineParams, AllProvided) {
     args.cmdLineParam[3] = "1.3";
     args.cmdLineParam[4] = "1.4";
     args.cmdLineParam[5] = "1.5";
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_FLOAT_EQ(P().clP1, 1.0);
     ASSERT_FLOAT_EQ(P().clP1, 1.0);
@@ -69,7 +69,7 @@ TEST_F(CommandLineParams, NoneProvided) {
     args.cmdLineParam[3].reset();
     args.cmdLineParam[4].reset();
     args.cmdLineParam[5].reset();
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_FLOAT_EQ(P().clP1, 0.0);
     ASSERT_FLOAT_EQ(P().clP1, 0.0);
@@ -82,13 +82,13 @@ TEST_F(CommandLineParams, NoneProvided) {
 
 TEST_F(DensityFiles, OptionalField) {
     args.densityFile.reset();
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().DoHeteroDensity, 0);
 }
 TEST_F(DensityFiles, SpecifiedFile) {
     args.densityFile = "density.dat";
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().DoHeteroDensity, 1);
     ASSERT_EQ(P().DoPeriodicBoundaries, 0);
@@ -96,13 +96,13 @@ TEST_F(DensityFiles, SpecifiedFile) {
 }
 TEST_F(DensityFiles, OutputOptional) {
     args.densityOutputFile.reset();
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().OutputDensFile, 0);
 }
 TEST_F(DensityFiles, OutputSpecified) {
     args.densityOutputFile = "outputDensity.dat";
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().OutputDensFile, 1);
     ASSERT_STREQ(OutDensFile(), "outputDensity.dat");
@@ -110,70 +110,70 @@ TEST_F(DensityFiles, OutputSpecified) {
 
 TEST_F(OutFileBasePath, Specifed) {
     args.outFileBasePath = "results_";
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_STREQ(OutFileBase(), "results_");
     ASSERT_STREQ(OutFile(), "results_");
 }
 TEST_F(OutFileBasePath, MandatoryField) {
     args.outFileBasePath.reset();
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_TRUE(Perr);
 }
 
 TEST_F(PreParamsFile, PreParamFileSet) {
     args.preParamFile = "testPreParams.txt";
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_STREQ(PreParamFile, "testPreParams.txt");
 }
 TEST_F(PreParamsFile, OptionalField) {
     args.paramFile = "params.txt";
     args.preParamFile.reset();
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_STREQ(PreParamFile, "../Pre_params.txt");
 }
 
 TEST_F(ParamsFile, ParamFileSet) {
     args.paramFile = "testParams.txt";
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_STREQ(ParamFile, "testParams.txt");
 }
 TEST_F(ParamsFile, MandatoryField) {
     args.paramFile.reset();
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_TRUE(Perr);
 }
 
 TEST_F(PlaceClose, IndepThreashold_Default) {
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().PlaceCloseIndepThresh, 0L);
 }
 TEST_F(PlaceClose, IndepThreashold_Enabled) {
     args.placeCloseIndepThreshold = "1";
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().PlaceCloseIndepThresh, 1L);
 }
 
 TEST_F(NetworkFiles, Default) {
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().LoadSaveNetwork, 0);
 }
 TEST_F(NetworkFiles, LoadFile) {
     args.networkFileToLoad = "fileToLoad";
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().LoadSaveNetwork, 1);
     ASSERT_STREQ(NetworkFile, "fileToLoad");
 }
 TEST_F(NetworkFiles, SaveFile) {
     args.networkFileToLoad = "fileToSave";
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().LoadSaveNetwork, 1);
     ASSERT_STREQ(NetworkFile, "fileToSave");
@@ -181,43 +181,43 @@ TEST_F(NetworkFiles, SaveFile) {
 TEST_F(NetworkFiles, NotBothLoadAndSave) {
     args.networkFileToSave = "fileToSave";
     args.networkFileToLoad = "fileToLoad";
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_TRUE(Perr);
 }
 TEST_F(Airports, Default) {
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(GotAP, 0);
 }
 TEST_F(Airports, SpecifyAirportFile ) {
     args.airTravelFile = "airTravel.dat";
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(GotAP, 1);
     ASSERT_STREQ(AirTravelFile, "airTravel.dat");
 }
 TEST_F(R0Scale, Optional) {
     args.r0.reset();
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().R0scale, 1.0);
 }
 TEST_F(R0Scale, Specified) {
     args.r0 = "2.3";
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
     ASSERT_FLOAT_EQ(P().R0scale, 2.3);
 }
 
 TEST_F(CommandLineParsingTest, DefaultArgs) {
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
     ASSERT_FALSE(Perr);
 }
 TEST_F(CommandLineParsingTest, SetupSeeds) {
     args.setupSeeds[0] = "789";
     args.setupSeeds[1] = "456";
 
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
 
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().setupSeed1, 789);
@@ -227,7 +227,7 @@ TEST_F(CommandLineParsingTest, RunTimeSeeds) {
     args.runSeeds[0] = "123";
     args.runSeeds[1] = "456";
 
-    InvokeReadParam(args.BuildCmdLine());
+    InvokeParseCmdLine(args.BuildCmdLine());
 
     ASSERT_FALSE(Perr);
     ASSERT_EQ(P().runSeed1, 123);

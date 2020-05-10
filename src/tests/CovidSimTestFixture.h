@@ -9,8 +9,9 @@ private:
     static constexpr size_t MAXINTFILE=10;
 public:
     void SetUp() override;
-    void InvokeReadParam(const std::vector<std::string>& args);
+    void InvokeParseCmdLine(const std::vector<std::string>& args);
     void InvokeSetupThreads();
+    void InvokeReadParams();
 
 protected:
     param& P();

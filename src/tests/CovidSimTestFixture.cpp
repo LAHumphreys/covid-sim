@@ -1,11 +1,6 @@
 #include "CovidSimTestFixture.h"
+#include "CovidSimExternInterface.h"
 
-void ParseCmdLineArgs(int argc, const char **argv, char *ParamFile, char *DensityFile, char *NetworkFile,
-                 char *AirTravelFile, char *SchoolFile, char *RegDemogFile,
-                 char InterventionFile[][1024] , char *PreParamFile, char *buf, char *sep,
-                 int &GotAP, int &GotScF, int &Perr);
-
-void SetupThreads();
 
 void CovidSimTestFixture::CovidSimMainInitialisation() {
     ///// Flags to ensure various parameters have been read; set to false as default.
@@ -29,7 +24,7 @@ void CovidSimTestFixture::SetUp() {
     memset(AdunitFile(), 0, CHAR_BUF_SIZE);
 }
 
-void CovidSimTestFixture::InvokeReadParam(const std::vector<std::string> &args) {
+void CovidSimTestFixture::InvokeParseCmdLine(const std::vector<std::string> &args) {
 
     const int argc = args.size();
     std::vector<const char*> argv;
@@ -43,32 +38,31 @@ void CovidSimTestFixture::InvokeReadParam(const std::vector<std::string> &args) 
                       buf, sep, GotAP, GotScF, Perr);
 }
 
-extern param P;
 param& CovidSimTestFixture::P() {
     return ::P;
 }
 
-extern char OutFile[1024];
 char* CovidSimTestFixture::OutFile() const {
     return ::OutFile;
 }
 
-extern char OutFileBase[1024];
 char* CovidSimTestFixture::OutFileBase() const {
     return ::OutFileBase;
 }
 
-extern char OutDensFile[1024];
 char *CovidSimTestFixture::OutDensFile() const {
     return ::OutDensFile;
 }
 
-extern char AdunitFile[1024];
 char *CovidSimTestFixture::AdunitFile() const {
     return ::AdunitFile;
 }
 
 void CovidSimTestFixture::InvokeSetupThreads() {
     SetupThreads();
+}
+
+void CovidSimTestFixture::InvokeReadParams() {
+    ReadParams(ParamFile, PreParamFile);
 }
 
