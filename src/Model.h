@@ -6,6 +6,7 @@
 #include "Country.h"
 #include "MachineDefines.h"
 #include "Constants.h"
+#include "Enum.h"
 
 
 //// need to test that inequalities in IncubRecoverySweep can be replaced if you initialize to USHRT_MAX, rather than zero.
@@ -20,7 +21,7 @@ typedef struct PERSON {
 	int infector;		// If >=0, Hosts[person->infector] was who infected this person
 	int listpos;		// Goes up to at least MAX_SEC_REC, also used as a temp variable?
 
-	int PlaceLinks[NUM_PLACE_TYPES]; //// indexed by i) place type. Value is the number of that place type (e.g. school no. 17; office no. 310 etc.) Place[i][person->PlaceLinks[i]], can be up to P.Nplace[i]
+	int PlaceLinks[PlaceType::Count]; //// indexed by i) place type. Value is the number of that place type (e.g. school no. 17; office no. 310 etc.) Place[i][person->PlaceLinks[i]], can be up to P.Nplace[i]
 	float infectiousness, susc,ProbAbsent,ProbCare;
 
 	unsigned int esocdist_comply : 1;
@@ -34,7 +35,7 @@ typedef struct PERSON {
 	unsigned char num_treats;		// set to 0 and tested < 2. but never modified?
 	signed char Severity_Current, Severity_Final; //// Note we allow Severity_Final to take values: Severity_Mild, Severity_ILI, Severity_SARI, Severity_Critical (not e.g. Severity_Dead or Severity_RecoveringFromCritical)
 
-	unsigned short int PlaceGroupLinks[NUM_PLACE_TYPES];	// These can definitely get > 255
+	unsigned short int PlaceGroupLinks[PlaceType::Count];	// These can definitely get > 255
 	short int inf, infect_type;		// INFECT_TYPE_MASK
 
 	unsigned short int detected_time; //added hospitalisation flag: ggilani 28/10/2014, added flag to determined whether this person's infection is detected or not
@@ -104,8 +105,8 @@ typedef struct POPVAR {
 	int cumItype[INFECT_TYPE_MASK], cumI_keyworker[2], cumC_keyworker[2], cumT_keyworker[2];
 	infection *inf_queue[MAX_NUM_THREADS]; // the queue (i.e. list) of infections. 1st index is thread, 2nd is person.
 	int n_queue[MAX_NUM_THREADS]; 	// number of infections in inf_queue
-	int* p_queue[NUM_PLACE_TYPES], *pg_queue[NUM_PLACE_TYPES], np_queue[NUM_PLACE_TYPES];		// np_queue is number of places in place queue (by place type), p_queue, and pg_queue is the actual place and place-group queue (i.e. list) of places. 1st index is place type, 2nd is place.
-	int NumPlacesClosed[NUM_PLACE_TYPES], n_mvacc, mvacc_cum;
+	int* p_queue[PlaceType::Count], *pg_queue[PlaceType::Count], np_queue[PlaceType::Count];		// np_queue is number of places in place queue (by place type), p_queue, and pg_queue is the actual place and place-group queue (i.e. list) of places. 1st index is place type, 2nd is place.
+	int NumPlacesClosed[PlaceType::Count], n_mvacc, mvacc_cum;
 	float* cell_inf;  //// List of spatial infectiousnesses by person within cell.
 	double sumRad2, maxRad2, cumT, cumV, cumVG, cumUT, cumTP, cumV_daily, cumVG_daily; //added cumVG, cumVG_daily
 	int* CellMemberArray, *CellSuscMemberArray;
@@ -156,7 +157,7 @@ typedef struct RESULTS {
 	double incHQ, incAC, incAH, incAA, incACS, incAPC, incAPA, incAPCS;
 	double incIa[NUM_AGE_GROUPS], incCa[NUM_AGE_GROUPS], incDa[NUM_AGE_GROUPS];
 	double incItype[INFECT_TYPE_MASK], Rtype[INFECT_TYPE_MASK], Rage[NUM_AGE_GROUPS], Rdenom;
-	double rmsRad, maxRad, PropPlacesClosed[NUM_PLACE_TYPES], PropSocDist;
+	double rmsRad, maxRad, PropPlacesClosed[PlaceType::Count], PropSocDist;
 	double incI_adunit[MAX_ADUNITS], incC_adunit[MAX_ADUNITS], cumT_adunit[MAX_ADUNITS], incD_adunit[MAX_ADUNITS], cumD_adunit[MAX_ADUNITS], incH_adunit[MAX_ADUNITS], incDC_adunit[MAX_ADUNITS]; //added incidence of hospitalisation per day: ggilani 28/10/14, incidence of detected cases per adunit,: ggilani 03/02/15
 	double incCT_adunit[MAX_ADUNITS], incCC_adunit[MAX_ADUNITS], incDCT_adunit[MAX_ADUNITS], DCT_adunit[MAX_ADUNITS]; //added incidence of contact tracing and number of people being contact traced per admin unit: ggilani 15/06/17
 	double incI_keyworker[2], incC_keyworker[2], cumT_keyworker[2];
@@ -253,8 +254,8 @@ typedef struct MICROCELL {
 	int* members;
 	unsigned short int country;
 
-	int* places[NUM_PLACE_TYPES];
-	unsigned short int np[NUM_PLACE_TYPES];
+	int* places[PlaceType::Count];
+	unsigned short int np[PlaceType::Count];
 	unsigned short int moverest, placeclose, socdist, keyworkerproph, move_trig, place_trig, socdist_trig, keyworkerproph_trig;
 	unsigned short int move_start_time, move_end_time;
 	unsigned short int place_end_time, socdist_end_time, keyworkerproph_end_time;
@@ -354,8 +355,8 @@ extern double indivR0[MAX_SEC_REC][MAX_GEN_REC], indivR0_av[MAX_SEC_REC][MAX_GEN
 extern double inf_household[MAX_HOUSEHOLD_SIZE + 1][MAX_HOUSEHOLD_SIZE + 1], denom_household[MAX_HOUSEHOLD_SIZE + 1];
 extern double inf_household_av[MAX_HOUSEHOLD_SIZE + 1][MAX_HOUSEHOLD_SIZE + 1], AgeDist[NUM_AGE_GROUPS], AgeDist2[NUM_AGE_GROUPS];
 extern double case_household[MAX_HOUSEHOLD_SIZE + 1][MAX_HOUSEHOLD_SIZE + 1], case_household_av[MAX_HOUSEHOLD_SIZE + 1][MAX_HOUSEHOLD_SIZE + 1];
-extern double PropPlaces[NUM_AGE_GROUPS * AGE_GROUP_WIDTH][NUM_PLACE_TYPES];
-extern double PropPlacesC[NUM_AGE_GROUPS * AGE_GROUP_WIDTH][NUM_PLACE_TYPES], AirTravelDist[MAX_DIST];
+extern double PropPlaces[NUM_AGE_GROUPS * AGE_GROUP_WIDTH][PlaceType::Count];
+extern double PropPlacesC[NUM_AGE_GROUPS * AGE_GROUP_WIDTH][PlaceType::Count], AirTravelDist[MAX_DIST];
 extern double PeakHeightSum, PeakHeightSS, PeakTimeSum, PeakTimeSS;
 
 extern int DoInitUpdateProbs;
