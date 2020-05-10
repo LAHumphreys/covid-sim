@@ -15,11 +15,6 @@ namespace {
 [Administrative unit to seed initial infection into]
 0
 
-
-[Population size]
-66777534
-[ONS pop proj]
-
 [Fix population size at specified value]
 1
 
@@ -185,5 +180,17 @@ East_Midlands	East_of_England	London	North_East	North_West	South_East	South_West
 std::unique_ptr<ConfigFile> AdunitConfigBuilder::BuildCfgFile(
         const std::string& fname) const
 {
-    return std::make_unique<ConfigFile>(fname, defaultContent);
+    std::stringstream buf;
+    buf << defaultContent << std::endl;
+    const auto addItem = [&] (const std::string& name, const std::optional<std::string>& val) {
+        if (val.has_value()) {
+            buf << std::endl;
+            buf << "[" << name << "]" << std::endl;
+            buf << val.value() << std::endl;
+        }
+    };
+    addItem("Population size", populationSize);
+    addItem("Include households", doHouseholds);
+
+    return std::make_unique<ConfigFile>(fname, buf.str());
 }

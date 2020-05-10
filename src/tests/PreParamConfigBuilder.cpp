@@ -12,45 +12,11 @@ namespace  {
 [Output bitmap]
 0
 
-[OutputAge]
-1
-
-[OutputSeverityAdminUnit]
-1
-
-[OutputR0]
-0
-
-[OutputControls]
-0
-
-[OutputCountry]
-0
-
-[OutputAdUnitVar]
-0
-
-[OutputHousehold]
-0
-
-[OutputInfType]
-0
-
-[OutputNonSeverity]
-0
-
-[OutputNonSummaryResults]
-0
-
 [Output incidence by administrative unit]
 0
 
 [Output infection tree]
 0
-
-[Only output non-extinct realisations]
-0
-
 
 ==========================================================
 
@@ -60,21 +26,12 @@ namespace  {
 [Equilibriation time]
 0
 
-[Sampling timestep]
-1
-
-[Sampling time]
-720
-
 [Grid size]
 0.075
 
 [Spatial domain for simulation]
 73	6.3
 136	54
-
-[Number of micro-cells per spatial cell width]
-9
 
 [Initial immunity profile by age]
 0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
@@ -255,15 +212,6 @@ Also comparable with 1957 pandemic attack rates from Chin.)
 0
 
 ====================================
-
-[Number of realisations]
-1
-
-[Number of non-extinct realisations]
-1
-
-[Maximum number of cases defining small outbreak]
-10000
 
 [Do one generation]
 0
@@ -479,5 +427,27 @@ std::unique_ptr<ConfigFile> PreParamConfigBuilder::BuildConfig(const std::string
         }
     };
     addItem("Update timestep", updateTimestep);
+    addItem("Sampling timestep", samplingTimestep);
+    addItem("Sampling time", samplingTotalTime);
+
+    addItem("Number of realisations", numberOfRealisations);
+    addItem("Number of non-extinct realisations", numberOfNonExtinctRealisations);
+    addItem("Only output non-extinct realisations", onlyOutputNonExtinctRealisations);
+
+    addItem("Maximum number of cases defining small outbreak", maxNumForSmallOutbreak);
+
+    addItem("Number of micro-cells per spatial cell width", numMicroCellsPerSpatialCell);
+
+    addItem("OutputAge", outputAge);
+    addItem("OutputSeverityAdminUnit", outputSeverityAdminUnit);
+    addItem("OutputR0", outputR0);
+    addItem("OutputControls", outputControls);
+    addItem("OutputCountry", outputCountry);
+    addItem("OutputAdUnitVar", outputAdUnitVar);
+    addItem("OutputHousehold", outputHousehold);
+    addItem("OutputInfType", outputInfType);
+    addItem("OutputNonSeverity", outputNonSeverity);
+    addItem("OutputNonSummaryResults", outputNonSummaryResults);
+
     return std::make_unique<ConfigFile>(fname, buf.str());
 }
