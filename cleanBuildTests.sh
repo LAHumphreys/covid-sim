@@ -47,7 +47,7 @@ function DoTests {
 
     cmake -DCMAKE_MODULE_PATH:PATH=$MODULE_PATH -DCMAKE_PREFIX_PATH:PATH=$PREFIX_PATH -DCMAKE_INSTALL_PREFIX:PATH=$INSTALL_PATH $srcDirRelToTestDir/tests || exit 1
     make -j 3 || exit 1
-    make test
+    make test || exit 1
 }
 
 if [[ "$1" == "-deepClean" ]]; then

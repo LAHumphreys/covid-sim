@@ -114,8 +114,8 @@ void
 ParseCmdLineArgs(int argc, const char** argv, char *ParamFile, char *DensityFile, char *NetworkFile,
                  char *AirTravelFile, char *SchoolFile, char *RegDemogFile,
                  char InterventionFile[][1024] , char *PreParamFile, char *buf, char *sep,
-                 int &GotPP, int &GotAP, int &GotScF, int &Perr) {
-    int GotL = 0, GotS = 0, GotO = 0, GotP = 0;
+                 int &GotAP, int &GotScF, int &Perr) {
+    int GotL = 0, GotS = 0, GotO = 0, GotP = 0, GotPP = 0;
     if (argc < 7) Perr = 1;
     else
     {
@@ -268,16 +268,46 @@ ParseCmdLineArgs(int argc, const char** argv, char *ParamFile, char *DensityFile
             }
         }
         if (((GotS) && (GotL)) || (!GotP) || (!GotO)) Perr = 1;
+
+        if (!GotPP)
+        {
+            sprintf(PreParamFile, ".." DIRECTORY_SEPARATOR "Pre_%s", ParamFile);
+        }
+
+        sprintf(OutFile, "%s", OutFileBase);
     }
+}
+
+void SetupThreads() {
+#ifdef _OPENMP
+    P.NumThreads = omp_get_max_threads();
+    if ((P.MaxNumThreads > 0) && (P.MaxNumThreads < P.NumThreads)) P.NumThreads = P.MaxNumThreads;
+    if (P.NumThreads > MAX_NUM_THREADS)
+    {
+        fprintf(stderr, "Assigned number of threads (%d) > MAX_NUM_THREADS (%d)\n", P.NumThreads, MAX_NUM_THREADS);
+        P.NumThreads = MAX_NUM_THREADS;
+    }
+    fprintf(stderr, "Using %d threads\n", P.NumThreads);
+    omp_set_num_threads(P.NumThreads);
+
+#pragma omp parallel default(shared)
+    {
+        fprintf(stderr, "Thread %i initialised\n", omp_get_thread_num());
+    }
+    /* fprintf(stderr,"int=%i\tfloat=%i\tdouble=%i\tint *=%i\n",(int) sizeof(int),(int) sizeof(float),(int) sizeof(double),(int) sizeof(int *));	*/
+#else
+    P.NumThreads = 1;
+#endif
+
 }
 
 int _main(int argc, const char* argv[])
 {
 	char ParamFile[1024]{}, DensityFile[1024]{}, NetworkFile[1024]{}, AirTravelFile[1024]{}, SchoolFile[1024]{}, RegDemogFile[1024]{}, InterventionFile[MAXINTFILE][1024]{}, PreParamFile[1024]{}, buf[2048]{}, * sep;
-	int i, GotPP, GotAP, GotScF, Perr, cl;
+	int i, GotAP, GotScF, Perr, cl;
 
 	///// Flags to ensure various parameters have been read; set to false as default.
-	GotAP = GotScF = GotPP = 0;
+	GotAP = GotScF = 0;
 
 	Perr = 0;
 	fprintf(stderr, "sizeof(int)=%i sizeof(long)=%i sizeof(float)=%i sizeof(double)=%i sizeof(unsigned short int)=%i sizeof(int *)=%i\n", (int)sizeof(int), (int)sizeof(long), (int)sizeof(float), (int)sizeof(double), (int)sizeof(unsigned short int), (int)sizeof(int*));
@@ -287,11 +317,10 @@ int _main(int argc, const char* argv[])
 
     ParseCmdLineArgs(argc, argv, ParamFile, DensityFile, NetworkFile, AirTravelFile, SchoolFile, RegDemogFile,
                      InterventionFile,
-                     PreParamFile, buf, sep, GotPP, GotAP, GotScF, Perr);
+                     PreParamFile, buf, sep, GotAP, GotScF, Perr);
 
     ///// END Read in command line arguments
 
-	sprintf(OutFile, "%s", OutFileBase);
 
 	fprintf(stderr, "Param=%s\nOut=%s\nDens=%s\n", ParamFile, OutFile, DensityFile);
 	if (Perr) ERR_CRITICAL_FMT("Syntax:\n%s /P:ParamFile /O:OutputFile [/AP:AirTravelFile] [/s:SchoolFile] [/D:DensityFile] [/L:NetworkFileToLoad | /S:NetworkFileToSave] [/R:R0scaling] SetupSeed1 SetupSeed2 RunSeed1 RunSeed2\n", argv[0]);
@@ -299,30 +328,8 @@ int _main(int argc, const char* argv[])
 	//// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// ****
 	//// **** SET UP OMP / THREADS
 	//// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// ****
+	SetupThreads();
 
-#ifdef _OPENMP
-	P.NumThreads = omp_get_max_threads();
-	if ((P.MaxNumThreads > 0) && (P.MaxNumThreads < P.NumThreads)) P.NumThreads = P.MaxNumThreads;
-	if (P.NumThreads > MAX_NUM_THREADS)
-	{
-		fprintf(stderr, "Assigned number of threads (%d) > MAX_NUM_THREADS (%d)\n", P.NumThreads, MAX_NUM_THREADS);
-		P.NumThreads = MAX_NUM_THREADS;
-	}
-	fprintf(stderr, "Using %d threads\n", P.NumThreads);
-	omp_set_num_threads(P.NumThreads);
-
-#pragma omp parallel default(shared)
-	{
-		fprintf(stderr, "Thread %i initialised\n", omp_get_thread_num());
-	}
-	/* fprintf(stderr,"int=%i\tfloat=%i\tdouble=%i\tint *=%i\n",(int) sizeof(int),(int) sizeof(float),(int) sizeof(double),(int) sizeof(int *));	*/
-#else
-	P.NumThreads = 1;
-#endif
-	if (!GotPP)
-	{
-		sprintf(PreParamFile, ".." DIRECTORY_SEPARATOR "Pre_%s", ParamFile);
-	}
 
 	//// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// **** //// ****
 	//// **** READ IN PARAMETERS, DATA ETC.
