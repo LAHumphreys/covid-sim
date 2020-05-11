@@ -19,7 +19,7 @@
 
 void* BinFileBuf;
 bin_file* BF;
-int netbuf[NUM_PLACE_TYPES * 1000000];
+int netbuf[PlaceType::Count * 1000000];
 
 
 ///// INITIALIZE / SET UP FUNCTIONS
@@ -221,7 +221,7 @@ void SetupModel(char* DensityFile, char* NetworkFile, char* SchoolFile, char* Re
 				TSMean[i].incAPA = TSMean[i].incAPCS = TSMean[i].Rdenom = 0;
 			TSVar[i].S = TSVar[i].I = TSVar[i].R = TSVar[i].D = TSVar[i].L =
 				TSVar[i].incI = TSVar[i].incR = TSVar[i].incC = TSVar[i].incTC = TSVar[i].incD = TSVar[i].H = TSVar[i].incH = TSVar[i].incCT = TSVar[i].CT = TSVar[i].incCC = TSMean[i].incDCT = TSVar[i].DCT = 0;
-			for (j = 0; j < NUM_PLACE_TYPES; j++) TSMean[i].PropPlacesClosed[j] = TSVar[i].PropPlacesClosed[j] = 0;
+			for (j = 0; j < PlaceType::Count; j++) TSMean[i].PropPlacesClosed[j] = TSVar[i].PropPlacesClosed[j] = 0;
 			for (j = 0; j < INFECT_TYPE_MASK; j++) TSMean[i].incItype[j] = TSMean[i].Rtype[j] = 0;
 			for (j = 0; j < NUM_AGE_GROUPS; j++) TSMean[i].incCa[j] = TSMean[i].incIa[j] = TSMean[i].incDa[j] = TSMean[i].Rage[j] = 0;
 			for (j = 0; j < 2; j++)
@@ -1808,7 +1808,7 @@ void AssignPeopleToPlaces(void)
 	cell* ct;
 	int npt;
 
-	npt = NUM_PLACE_TYPES;
+	npt = PlaceType::Count;
 
 	if (P.DoPlaces)
 	{
@@ -2301,7 +2301,7 @@ void StratifyPlaces(void)
 		fprintf(stderr, "Initialising groups in places\n");
 #pragma omp parallel for private(i,j) schedule(static,500)
 		for (i = 0; i < P.PopSize; i++)
-			for (j = 0; j < NUM_PLACE_TYPES; j++)
+			for (j = 0; j < PlaceType::Count; j++)
 				Hosts[i].PlaceGroupLinks[j] = 0;
 		for (j = 0; j < P.PlaceTypeNum; j++)
 			for (i = 0; i < P.Nplace[j]; i++)
