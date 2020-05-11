@@ -20,7 +20,6 @@ add_library(CovidSim
             ../CovidSim.h
             ../Dist.cpp
             ../Dist.h
-            ../Error.cpp
             ../Error.h
             ../InfStat.h
             ../Kernels.cpp
@@ -38,6 +37,7 @@ add_library(CovidSim
             ../Sweep.h
             ../Update.cpp
             ../Update.h
+		    testError.cpp
 	    )
 
 option(USE_OPENMP "Compile with OpenMP parallelism enabled" ON)
@@ -47,12 +47,26 @@ target_include_directories(CovidSim PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(CovidSim PUBLIC OpenMP::OpenMP_CXX)
 
 add_library(CovidSimTest
+		ConfigFile.cpp
+		ConfigFile.h
+		CovidSimCmdLineArgs.cpp
+		CovidSimCmdLineArgs.h
+		CovidSimExternInterface.h
 		CovidSimTestFixture.cpp
-		CovidSimTestFixture.h CovidSimCmdLineArgs.cpp CovidSimCmdLineArgs.h)
+		CovidSimTestFixture.h
+		ParamsConfigBuilder.cpp
+		ParamsConfigBuilder.h
+		PreParamConfigBuilder.cpp
+		PreParamConfigBuilder.h
+		AdunitConfigBuilder.cpp AdunitConfigBuilder.h)
 target_link_libraries(CovidSimTest PUBLIC CovidSim GTest::GTest)
 
 add_executable(testCommandLineParsing testCommandLineParsing.cpp)
 target_link_libraries(testCommandLineParsing CovidSim CovidSimTest GTest::GTest GTest::Main)
 
+add_executable(testParamParsing testParamParsing.cpp)
+target_link_libraries(testParamParsing CovidSim CovidSimTest GTest::GTest GTest::Main)
+
 enable_testing()
 add_test(testCommandLineParsing testCommandLineParsing)
+add_test(testParamParsing testParamParsing)
