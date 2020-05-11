@@ -25,10 +25,4 @@
 	#define PLACE_TREATED(x,y) (0)
   */
 
-//// place type codes
-#define PlaceType_PrimarySchool			0
-#define PlaceType_SecondarySchool		1
-#define PlaceType_University			2
-#define PlaceType_Office				3
-
 #endif // COVIDSIM_COVIDSIM_H_INCLUDED_
