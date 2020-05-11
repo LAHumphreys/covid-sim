@@ -29,6 +29,9 @@ struct AdunitConfigBuilder {
     std::optional<std::string> householdSizeDist = "0.305305	0.342342	0.159159	0.136136	0.040040	0.011243	0.003677	0.001256	0.000453	0.000388";
     std::optional<std::string> correctHouseAgeDistToExactGeography = "1";
 
+    std::optional<std::string> divisorForCountries = "100000";
+
+
     std::unique_ptr<ConfigFile> BuildCfgFile(const std::string& fname = "admin.txt") const;
 };
 

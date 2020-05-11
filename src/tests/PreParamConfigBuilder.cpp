@@ -12,16 +12,10 @@ namespace  {
 [Output bitmap]
 0
 
-[Output incidence by administrative unit]
-0
-
 [Output infection tree]
 0
 
 ==========================================================
-
-[Include administrative units within countries]
-1
 
 [Equilibriation time]
 0
@@ -442,6 +436,8 @@ std::unique_ptr<ConfigFile> PreParamConfigBuilder::BuildConfig(const std::string
     addItem("OutputNonSummaryResults", outputNonSummaryResults);
     addItem("Household attack rate", householdAttackRate);
     addItem("Household transmission denominator power", householdTransPowerDenom);
+    addItem("Include administrative units within countries", includeAdUnitsWithinCountries);
+    addItem("Output incidence by administrative unit", outputAdunitIncidence);
 
     return std::make_unique<ConfigFile>(fname, buf.str());
 }

@@ -38,6 +38,9 @@ struct PreParamConfigBuilder {
 
     std::optional<std::string> householdAttackRate = "0.1";
     std::optional<std::string> householdTransPowerDenom = "0.8"; // see Cauchemez 2004. Deals with impact of increasing size of households on transmitablility
+
+    std::optional<std::string> includeAdUnitsWithinCountries = "1.0";
+    std::optional<std::string> outputAdunitIncidence = "0";
 };
 
 

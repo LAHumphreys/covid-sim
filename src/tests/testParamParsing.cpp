@@ -46,8 +46,40 @@ namespace {
     class Households: public ParamParsingTest {};
     class Output: public ParamParsingTest {};
     class Kernel: public ParamParsingTest {};
+    class AdUnits: public ParamParsingTest {};
 }
 
+TEST_F(AdUnits, Specified) {
+    preParams.includeAdUnitsWithinCountries = "1";
+    adUnit.divisorForCountries = "1000";
+    preParams.outputAdunitIncidence = "1";
+    SetupAndParseParams();
+    ASSERT_EQ(P().DoAdUnits, 1);
+    ASSERT_EQ(P().CountryDivisor, 1000);
+    ASSERT_EQ(P().DoAdunitOutput, 1);
+}
+TEST_F(AdUnits, Disabled) {
+    preParams.includeAdUnitsWithinCountries = "0";
+    SetupAndParseParams();
+    ASSERT_EQ(P().DoAdUnits, 0);
+    ASSERT_EQ(P().DoAdunitBoundaries, 0);
+    ASSERT_EQ(P().DoAdunitBoundaryOutput, 0);
+    ASSERT_EQ(P().DoAdunitOutput, 0);
+    ASSERT_EQ(P().DoCorrectAdunitPop, 0);
+    ASSERT_EQ(P().DoSpecifyPop, 0);
+    ASSERT_EQ(P().AdunitLevel1Divisor, 1);
+    ASSERT_EQ(P().AdunitLevel1Mask, 1000000000);
+    ASSERT_EQ(P().AdunitBitmapDivisor, 1);
+}
+TEST_F(AdUnits, DefaultEnabled) {
+    preParams.includeAdUnitsWithinCountries.reset();
+    adUnit.divisorForCountries.reset();
+    preParams.outputAdunitIncidence.reset();
+    SetupAndParseParams();
+    ASSERT_EQ(P().DoAdUnits, 1);
+    ASSERT_EQ(P().CountryDivisor, 1);
+    ASSERT_EQ(P().DoAdunitOutput, 0);
+}
 TEST_F(Kernel, Specified) {
     adUnit.kernelResolution = "2000000";
     adUnit.kernelHigherResolutionFactor  = "40";

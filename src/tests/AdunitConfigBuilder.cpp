@@ -55,9 +55,6 @@ East_Midlands	East_of_England	London	North_East	North_West	South_East	South_West
 [Divisor for level 1 administrative units]
 100
 
-[Divisor for countries]
-100000
-
 [Correct administrative unit populations]
 0
 
@@ -175,6 +172,7 @@ std::unique_ptr<ConfigFile> AdunitConfigBuilder::BuildCfgFile(
     addItem("Kernel 4th param for place types", kernelParam4ForPlaces);
     addItem("Household size distribution", householdSizeDist);
     addItem("Correct age distribution after household allocation to exactly match specified demography", correctHouseAgeDistToExactGeography);
+    addItem("Divisor for countries", divisorForCountries);
 
     return std::make_unique<ConfigFile>(fname, buf.str());
 }
